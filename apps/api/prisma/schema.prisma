@@ -1,0 +1,708 @@
+// Fase 0: identidad y acceso (User, Role, Permission).
+// Fase 1: catálogo (Property + traducciones), ubicaciones, media pública/privada, CRM (Contact/Lead),
+// atribución de marketing y analítica — ver docs/decisiones-fase-1.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  users       User[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@map("roles")
+}
+
+model Permission {
+  id        String           @id @default(uuid())
+  resource  String
+  action    String
+  roles     RolePermission[]
+  createdAt DateTime         @default(now())
+
+  @@unique([resource, action])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  isActive     Boolean  @default(true)
+  roleId       String
+  role         Role     @relation(fields: [roleId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listedProperties  Property[]
+  assignedLeads     Lead[]
+  uploadedDocuments PropertyDocument[]
+  auditLogs         AuditLog[]
+  appointments      Appointment[]
+  blogPosts         BlogPost[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// Fase 1 — Ubicaciones
+// ---------------------------------------------------------------------------
+
+model City {
+  id            String         @id @default(uuid())
+  name          String
+  slug          String         @unique
+  department    String
+  country       String         @default("Colombia")
+  isActive      Boolean        @default(true)
+  neighborhoods Neighborhood[]
+  properties    Property[]
+  blogPosts     BlogPost[]
+  faqs          Faq[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("cities")
+}
+
+model Neighborhood {
+  id         String     @id @default(uuid())
+  name       String
+  slug       String
+  cityId     String
+  city       City       @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  properties Property[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@unique([cityId, slug])
+  @@map("neighborhoods")
+}
+
+// ---------------------------------------------------------------------------
+// Fase 1 — Catálogo
+// ---------------------------------------------------------------------------
+
+enum PropertyPublicationStatus {
+  DRAFT
+  PUBLISHED
+  PAUSED
+  SOLD
+  ARCHIVED
+}
+
+enum OperationType {
+  SALE
+  RENT
+}
+
+enum Currency {
+  COP
+  USD
+}
+
+model PropertyType {
+  id         String     @id @default(uuid())
+  name       String
+  slug       String     @unique
+  properties Property[]
+  createdAt  DateTime   @default(now())
+
+  @@map("property_types")
+}
+
+model PropertyFeature {
+  id         String                      @id @default(uuid())
+  name       String
+  slug       String                      @unique
+  properties PropertyFeatureOnProperty[]
+  createdAt  DateTime                    @default(now())
+
+  @@map("property_features")
+}
+
+model PropertyFeatureOnProperty {
+  propertyId String
+  featureId  String
+  property   Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  feature    PropertyFeature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, featureId])
+  @@map("property_features_on_properties")
+}
+
+model Property {
+  id            String                    @id @default(uuid())
+  /// Generado una vez al publicar y nunca regenerado — protege el SEO acumulado (v1 sección 08).
+  slug          String                    @unique
+  operationType OperationType
+  price         Decimal                   @db.Decimal(14, 2)
+  currency      Currency                  @default(COP)
+  bedrooms      Int
+  bathrooms     Int
+  parkingSpots  Int                       @default(0)
+  builtAreaM2   Decimal                   @db.Decimal(10, 2)
+  landAreaM2    Decimal?                  @db.Decimal(10, 2)
+  yearBuilt     Int?
+  addressLine   String?
+  latitude      Decimal?                  @db.Decimal(9, 6)
+  longitude     Decimal?                  @db.Decimal(9, 6)
+  status        PropertyPublicationStatus @default(DRAFT)
+  publishedAt   DateTime?
+  /// Control manual del admin — antes no existía, la Home marcaba "Destacada" a la propiedad
+  /// más reciente por accidente (índice 0 del listado, no una elección real).
+  isFeatured    Boolean                   @default(false)
+
+  cityId         String
+  city           City          @relation(fields: [cityId], references: [id])
+  neighborhoodId String?
+  neighborhood   Neighborhood? @relation(fields: [neighborhoodId], references: [id])
+  propertyTypeId String
+  propertyType   PropertyType  @relation(fields: [propertyTypeId], references: [id])
+  agentId        String?
+  agent          User?         @relation(fields: [agentId], references: [id])
+
+  translations PropertyTranslation[]
+  media        PropertyMedia[]
+  documents    PropertyDocument[]
+  features     PropertyFeatureOnProperty[]
+  inquiries    PropertyInquiry[]
+  appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("properties")
+}
+
+/// Datos estructurales (precio, área, ubicación...) viven una sola vez en Property.
+/// Solo el contenido lingüístico se traduce — evita duplicar la propiedad por idioma.
+model PropertyTranslation {
+  id                   String   @id @default(uuid())
+  propertyId           String
+  property             Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  locale               String
+  title                String
+  subtitle             String?
+  shortDescription     String
+  fullDescription      String
+  seoTitle             String?
+  seoDescription       String?
+  seoCanonicalOverride String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([propertyId, locale])
+  @@map("property_translations")
+}
+
+enum PropertyMediaType {
+  PHOTO
+  VIDEO
+  TOUR
+  FLOORPLAN
+}
+
+/// Multimedia pública — se sirve sin autenticación en la ficha de propiedad.
+model PropertyMedia {
+  id         String            @id @default(uuid())
+  propertyId String
+  property   Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  type       PropertyMediaType
+  url        String
+  order      Int               @default(0)
+  createdAt  DateTime          @default(now())
+
+  @@map("property_media")
+}
+
+enum PropertyDocumentType {
+  LEGAL
+  CERTIFICATE
+  ADMINISTRATIVE
+  OTHER
+}
+
+/// Documentos internos — NUNCA expuestos en el endpoint público de propiedad (v1 sección 13 de correcciones).
+model PropertyDocument {
+  id           String               @id @default(uuid())
+  propertyId   String
+  property     Property             @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  type         PropertyDocumentType
+  fileName     String
+  storagePath  String
+  uploadedById String
+  uploadedBy   User                 @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime             @default(now())
+
+  @@map("property_documents")
+}
+
+// ---------------------------------------------------------------------------
+// Fase 1 — CRM: Contact, Lead, PropertyInquiry, atribución
+// ---------------------------------------------------------------------------
+
+enum PreferredChannel {
+  WHATSAPP
+  PHONE
+  EMAIL
+}
+
+/// Identidad de la persona. Existe apenas deja datos — no implica todavía intención comercial.
+model Contact {
+  id               String            @id @default(uuid())
+  name             String
+  phone            String?
+  whatsapp         String?
+  email            String?
+  preferredChannel PreferredChannel
+  sessionId        String?
+  lead             Lead?
+  inquiries        PropertyInquiry[]
+  conversations    AiConversation[]
+  createdAt        DateTime          @default(now())
+
+  @@map("contacts")
+}
+
+enum LeadSourceChannel {
+  ORGANIC
+  GOOGLE
+  GOOGLE_ADS
+  FACEBOOK
+  INSTAGRAM
+  META_ADS
+  TIKTOK
+  WHATSAPP
+  DIRECT
+  REFERRAL
+  WEBSITE
+  AI_AGENT
+  OTHER
+}
+
+enum LeadFunnelStage {
+  VISITOR
+  ENGAGED
+  CONTACT
+  LEAD
+  QUALIFIED
+  APPOINTMENT
+  VISIT
+  NEGOTIATION
+  OFFER
+  WON
+  LOST
+}
+
+enum LeadLostReason {
+  BUDGET
+  NO_RESPONSE
+  CHOSE_ANOTHER_PROPERTY
+  FINANCING
+  NOT_THE_RIGHT_TIME
+  PROPERTY_SOLD
+  OTHER
+}
+
+/// Envoltorio comercial 1:1 sobre Contact: representa intención de compra y estado de funnel.
+model Lead {
+  id                     String            @id @default(uuid())
+  contactId              String            @unique
+  contact                Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  source                 LeadSourceChannel
+  funnelStage            LeadFunnelStage   @default(LEAD)
+  budget                 Decimal?          @db.Decimal(14, 2)
+  cityInterestId         String?
+  propertyTypeInterestId String?
+  assignedAgentId        String?
+  assignedAgent          User?             @relation(fields: [assignedAgentId], references: [id])
+  notes                  String?
+  lostReason             LeadLostReason?
+  lostAt                 DateTime?
+
+  firstTouchId String?         @unique
+  firstTouch   MarketingTouch? @relation("LeadFirstTouch", fields: [firstTouchId], references: [id])
+  lastTouchId  String?         @unique
+  lastTouch    MarketingTouch? @relation("LeadLastTouch", fields: [lastTouchId], references: [id])
+
+  /// Basado en reglas explicables, no ML — `scoreBreakdown` guarda qué señales lo compusieron
+  /// para que el asesor pueda ver el porqué, no un número mágico (v1 sección 4 de correcciones).
+  score          Int   @default(0)
+  scoreBreakdown Json?
+
+  activities    LeadActivity[]
+  appointments  Appointment[]
+  conversations AiConversation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("leads")
+}
+
+enum InquiryType {
+  GENERAL_INFO
+  WHATSAPP_CONTACT
+  ADVISOR_REQUEST
+  VISIT_REQUEST
+}
+
+enum InterestLevel {
+  HIGH
+  MEDIUM
+  DISCARDED
+}
+
+/// N:N entre un Contact y las propiedades por las que mostró interés (v1 sección 10 de correcciones).
+model PropertyInquiry {
+  id            String        @id @default(uuid())
+  contactId     String
+  contact       Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  propertyId    String
+  property      Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  inquiryType   InquiryType
+  interestLevel InterestLevel @default(MEDIUM)
+  note          String?
+  createdAt     DateTime      @default(now())
+
+  @@map("property_inquiries")
+}
+
+/// Un touch por sesión con campaña identificable (o el primero sin campaña, para first-touch orgánico).
+model MarketingTouch {
+  id          String   @id @default(uuid())
+  sessionId   String
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmContent  String?
+  utmTerm     String?
+  gclid       String?
+  fbclid      String?
+  referrer    String?
+  landingPage String?
+  createdAt   DateTime @default(now())
+
+  leadAsFirstTouch Lead? @relation("LeadFirstTouch")
+  leadAsLastTouch  Lead? @relation("LeadLastTouch")
+
+  @@index([sessionId])
+  @@map("marketing_touches")
+}
+
+// ---------------------------------------------------------------------------
+// Fase 1 — Analítica y auditoría
+// ---------------------------------------------------------------------------
+
+model AnalyticsEvent {
+  id         String   @id @default(uuid())
+  type       String
+  sessionId  String
+  propertyId String?
+  leadId     String?
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@map("analytics_events")
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  PUBLISH
+  PAUSE
+  MARK_SOLD
+  ARCHIVE
+  DELETE
+  FEATURE
+  UNFEATURE
+}
+
+model AuditLog {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  entity    String
+  entityId  String
+  action    AuditAction
+  diff      Json?
+  createdAt DateTime    @default(now())
+
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
+
+// ---------------------------------------------------------------------------
+// Fase 2 — WhatsApp, Agente IA, Lead Activities, Lead Scoring, Appointments
+// ---------------------------------------------------------------------------
+
+enum ConversationChannel {
+  WHATSAPP
+  WEB
+}
+
+enum ConversationStatus {
+  BOT
+  HUMAN
+}
+
+enum MessageDirection {
+  IN
+  OUT
+}
+
+enum AiQualification {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+/// Entendimiento del agente sobre una conversación — resumen, propiedades sugeridas,
+/// calificación, si fue escalada. Independiente del canal (v1 sección 13).
+model AiConversation {
+  id                        String                @id @default(uuid())
+  channel                   ConversationChannel
+  /// Número de WhatsApp o sessionId web — clave para retomar una conversación existente.
+  sessionKey                String
+  status                    ConversationStatus    @default(BOT)
+  contactId                 String?
+  contact                   Contact?              @relation(fields: [contactId], references: [id])
+  leadId                    String?
+  lead                      Lead?                 @relation(fields: [leadId], references: [id])
+  summary                   String?
+  suggestedPropertyIds      String[]              @default([])
+  qualification             AiQualification?
+  /// "Sí, quiero que me contacten" explícito — distinto del opt-in de ventana de 24h de WhatsApp.
+  consentToContact          Boolean               @default(false)
+  contactOfferMade          Boolean               @default(false)
+  contactOfferDeclined      Boolean               @default(false)
+  awaitingContactChoice     Boolean               @default(false)
+  lowConfidenceStreak       Int                   @default(0)
+  /// Bookkeeping interno del LlmProvider activo entre turnos — array de {slug,title}.
+  lastSearchResults         Json                  @default("[]")
+  /// slug de propiedad → veces que el usuario mostró interés puntual en ella.
+  propertyInterestCounts    Json                  @default("{}")
+  lastDiscussedPropertySlug String?
+  messages                  AiMessage[]
+  whatsapp                  WhatsAppConversation?
+  createdAt                 DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+
+  @@index([channel, sessionKey])
+  @@map("ai_conversations")
+}
+
+/// Transcripción completa (todo mensaje, no solo hitos). `milestone` marca los mensajes que
+/// se backfillean como LeadActivity una vez que la conversación produce un Lead.
+model AiMessage {
+  id             String           @id @default(uuid())
+  conversationId String
+  conversation   AiConversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction      MessageDirection
+  content        String
+  milestone      String?
+  createdAt      DateTime         @default(now())
+
+  @@index([conversationId, createdAt])
+  @@map("ai_messages")
+}
+
+/// Metadatos de transporte específicos de WhatsApp, 1:1 sobre AiConversation.
+/// `optInAt` es el primer mensaje entrante real (no un click en el sitio) — v1 corrección sección 14:
+/// un click en el botón de WhatsApp no implica consentimiento ilimitado para mensajería futura.
+model WhatsAppConversation {
+  id               String         @id @default(uuid())
+  phoneNumber      String         @unique
+  aiConversationId String         @unique
+  aiConversation   AiConversation @relation(fields: [aiConversationId], references: [id], onDelete: Cascade)
+  optInAt          DateTime?
+  lastInboundAt    DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@map("whatsapp_conversations")
+}
+
+enum LeadActivityType {
+  CONVERSATION_STARTED
+  PROPERTY_VIEWED
+  CONTACT_OFFERED
+  CONTACT_ACCEPTED
+  CONTACT_DECLINED
+  HANDOFF_TO_HUMAN
+  LEAD_CREATED
+  STAGE_CHANGED
+  APPOINTMENT_PROPOSED
+  APPOINTMENT_CONFIRMED
+  NOTE
+}
+
+/// Historial de interacción de un Lead — incluye hitos backfilleados desde la conversación
+/// de IA/WhatsApp que lo originó, no cada mensaje individual (v1 sección 9 de correcciones).
+model LeadActivity {
+  id          String           @id @default(uuid())
+  leadId      String
+  lead        Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type        LeadActivityType
+  description String
+  metadata    Json?
+  occurredAt  DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+
+  @@index([leadId, occurredAt])
+  @@map("lead_activities")
+}
+
+enum AppointmentType {
+  VISIT
+  CALL
+}
+
+enum AppointmentStatus {
+  PROPOSED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+/// El agente IA puede proponer (`PROPOSED`); solo un humano confirma desde el admin —
+/// nunca se auto-confirma para evitar overbooking de un asesor (v1 sección 5 de correcciones).
+model Appointment {
+  id               String            @id @default(uuid())
+  leadId           String
+  lead             Lead              @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  propertyId       String
+  property         Property          @relation(fields: [propertyId], references: [id])
+  agentId          String?
+  agent            User?             @relation(fields: [agentId], references: [id])
+  type             AppointmentType
+  status           AppointmentStatus @default(PROPOSED)
+  proposedAt       DateTime
+  confirmedAt      DateTime?
+  proposedBySystem Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([leadId])
+  @@map("appointments")
+}
+
+// ---------------------------------------------------------------------------
+// Fase 3 — Blog (AEO editorial) y FAQ reutilizable (AEO estructurado)
+// ---------------------------------------------------------------------------
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Mismo patrón que Property/PropertyTranslation: lo estructural vive una vez,
+/// solo el contenido lingüístico se traduce (v1 sección 11 de correcciones).
+model BlogPost {
+  id           String                @id @default(uuid())
+  /// Generado una vez al crear — nunca se regenera (mismo criterio que Property, v1 sección 08).
+  slug         String                @unique
+  status       BlogPostStatus        @default(DRAFT)
+  /// Contenido pendiente de validación editorial/legal antes de pasar a PUBLISHED
+  /// (v1 corrección sección 4 de esta fase: nunca inventar condiciones legales/financieras).
+  needsReview  Boolean               @default(false)
+  publishedAt  DateTime?
+  authorId     String?
+  author       User?                 @relation(fields: [authorId], references: [id])
+  cityId       String?
+  city         City?                 @relation(fields: [cityId], references: [id])
+  translations BlogPostTranslation[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@map("blog_posts")
+}
+
+model BlogPostTranslation {
+  id             String   @id @default(uuid())
+  blogPostId     String
+  blogPost       BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  locale         String
+  title          String
+  excerpt        String
+  body           String
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([blogPostId, locale])
+  @@map("blog_post_translations")
+}
+
+enum FaqRelatedEntity {
+  GENERAL
+  CITY
+}
+
+/// Tipo "faq" reutilizable previsto en el v1 (sección 10 de correcciones). Las preguntas dinámicas
+/// (`isDynamic`) no guardan respuesta: se calculan en vivo desde el catálogo real vía `dynamicKey`
+/// (ver FaqService) — si cambian los precios, la respuesta cambia sola, nunca queda hardcodeada.
+model Faq {
+  id            String           @id @default(uuid())
+  relatedEntity FaqRelatedEntity @default(GENERAL)
+  cityId        String?
+  city          City?            @relation(fields: [cityId], references: [id])
+  order         Int              @default(0)
+  isDynamic     Boolean          @default(false)
+  dynamicKey    String?
+  translations  FaqTranslation[]
+  createdAt     DateTime         @default(now())
+
+  @@map("faqs")
+}
+
+model FaqTranslation {
+  id       String  @id @default(uuid())
+  faqId    String
+  faq      Faq     @relation(fields: [faqId], references: [id], onDelete: Cascade)
+  locale   String
+  question String
+  /// Ignorada cuando el Faq es dinámico — ver Faq.isDynamic.
+  answer   String?
+
+  @@unique([faqId, locale])
+  @@map("faq_translations")
+}
+
+// ---------------------------------------------------------------------------
+// Fase 4 — Configuración global
+// ---------------------------------------------------------------------------
+
+/// Configuración global editable por el admin. `fxRateUsdCop` es la única entrada real de
+/// Fase 4: tasa manual para la conversión informativa COP→USD (v1 sección 3, sin API externa).
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}

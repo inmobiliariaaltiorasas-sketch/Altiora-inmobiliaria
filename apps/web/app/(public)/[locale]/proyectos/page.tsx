@@ -1,0 +1,35 @@
+import type { Metadata } from 'next';
+import type { SupportedLocale } from '@altiora/shared-types';
+
+const COPY: Record<SupportedLocale, { title: string; body: string }> = {
+  'es-CO': {
+    title: 'Proyectos',
+    body: 'Estamos preparando esta sección con los proyectos de construcción de ALTiora. Muy pronto vas a poder conocerlos acá.',
+  },
+  'en-US': {
+    title: 'Projects',
+    body: "We're getting this section ready with ALTiora's construction projects. Check back soon.",
+  },
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = (await params) as { locale: SupportedLocale };
+  return { title: `${COPY[locale].title} | ALTiora` };
+}
+
+export default async function ProjectsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = (await params) as { locale: SupportedLocale };
+  const copy = COPY[locale];
+
+  return (
+    <main className="container" style={{ padding: '3rem 1.5rem 4rem', maxWidth: '34rem' }}>
+      <span className="eyebrow">ALTiora</span>
+      <h1 style={{ fontSize: '1.9rem', marginTop: '0.5rem' }}>{copy.title}</h1>
+      <p style={{ color: 'var(--text-muted)', marginTop: '0.6rem' }}>{copy.body}</p>
+    </main>
+  );
+}

@@ -1,0 +1,24 @@
+.searchOverlap {
+  position: relative;
+  margin-top: -4.5rem;
+}
+
+.brandSection {
+  padding: 0 1.5rem clamp(3.5rem, 7vw, 6rem);
+}
+
+@media (max-width: 900px) {
+  .searchOverlap {
+    margin-top: -2.5rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .searchOverlap {
+    margin-top: 1.5rem;
+  }
+
+  .brandSection {
+    padding: 0 1.25rem 2.5rem;
+  }
+}

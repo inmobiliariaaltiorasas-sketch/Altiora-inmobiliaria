@@ -1,0 +1,111 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--navy-900);
+  color: var(--cream);
+  border-bottom: 1px solid var(--gold-500);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.35rem 1.5rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: var(--cream);
+  flex: none;
+}
+
+.logoMark {
+  height: 2.75rem;
+  width: auto;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.85rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #e6e2d2;
+  text-decoration: none;
+  font-size: 0.93rem;
+  letter-spacing: 0.015em;
+  padding: 0.3rem 0;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.navLink:hover {
+  color: var(--gold-400);
+  border-color: var(--gold-500);
+}
+
+.navChevron {
+  width: 0.55rem;
+  height: 0.55rem;
+  color: var(--gold-500);
+  opacity: 0.85;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: none;
+}
+
+.whatsappCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--gold-500);
+  background: var(--gold-500);
+  color: var(--navy-900);
+  text-decoration: none;
+  font-size: 0.87rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px -8px rgba(201, 162, 39, 0.55);
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.whatsappCta:hover {
+  background: var(--gold-400);
+  transform: translateY(-1px);
+}
+
+.whatsappIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 900px) {
+  .nav {
+    display: none;
+  }
+
+  .whatsappCta {
+    display: none;
+  }
+}

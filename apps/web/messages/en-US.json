@@ -1,0 +1,21 @@
+{
+  "nav": {
+    "home": "Home",
+    "properties": "Properties",
+    "cities": "Cities",
+    "projects": "Projects",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact",
+    "tagline": "Construction & Real Estate",
+    "whatsappCta": "Chat on WhatsApp",
+    "mainNav": "Main navigation"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "note": "Cartago, Valle del Cauca, Colombia."
+  },
+  "localeSwitcher": {
+    "label": "Language"
+  }
+}

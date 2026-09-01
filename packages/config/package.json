@@ -1,0 +1,11 @@
+{
+  "name": "@altiora/config",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.js",
+  "files": [
+    "tsconfig.base.json",
+    "eslint.base.mjs",
+    "prettier.base.json"
+  ]
+}

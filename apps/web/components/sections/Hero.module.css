@@ -1,0 +1,143 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  color: var(--cream);
+  padding-bottom: 4rem;
+}
+
+/* Funde el borde inferior del Hero hacia el fondo de la página en vez de cortar en seco,
+   para que la card del buscador se sienta parte de la misma composición, no superpuesta
+   sobre una costura. Se pinta encima del overlay pero debajo del texto/beneficios. */
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 7rem;
+  z-index: 2;
+  background: linear-gradient(180deg, transparent, var(--paper) 94%);
+  pointer-events: none;
+}
+
+.photo {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center 38%;
+}
+
+.texture {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(217, 180, 88, 0.14), transparent 42%),
+    radial-gradient(circle at 88% 75%, rgba(217, 180, 88, 0.06), transparent 46%),
+    linear-gradient(165deg, rgba(15, 24, 48, 0.32) 0%, rgba(15, 24, 48, 0.55) 100%);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    100deg,
+    rgba(8, 13, 27, 0.84) 0%,
+    rgba(8, 13, 27, 0.5) 46%,
+    rgba(8, 13, 27, 0.14) 78%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 3;
+  margin: 0;
+  padding: 4rem 1.5rem 1.5rem;
+  max-width: 44rem;
+}
+
+.eyebrow {
+  color: var(--gold-400);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.title {
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin-top: 0.75rem;
+  text-wrap: balance;
+  color: var(--cream);
+}
+
+.subtitle {
+  color: var(--cream-muted);
+  opacity: 0.82;
+  margin-top: 1.1rem;
+  font-size: 0.96rem;
+  font-weight: 400;
+  max-width: 32rem;
+}
+
+.benefits {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 2.1rem 0 0;
+  padding: 0;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  color: #dfe3f2;
+  line-height: 1.35;
+}
+
+@media (min-width: 641px) {
+  .benefit:not(:first-child) {
+    border-left: 1px solid rgba(217, 180, 88, 0.3);
+    padding-left: 2rem;
+  }
+}
+
+.benefitIcon {
+  width: 1.6rem;
+  height: 1.6rem;
+  color: var(--gold-400);
+  flex: none;
+}
+
+@media (min-width: 901px) {
+  .hero {
+    min-height: 28rem;
+  }
+
+  .content {
+    padding-left: 4rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding-bottom: 2.5rem;
+  }
+
+  .content {
+    padding-top: 4rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .benefits {
+    gap: 1.1rem;
+  }
+}

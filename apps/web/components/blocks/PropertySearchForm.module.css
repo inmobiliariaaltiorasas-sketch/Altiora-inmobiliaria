@@ -1,0 +1,133 @@
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1.1rem;
+  padding: 1.25rem;
+}
+
+.heroWrapper {
+  position: relative;
+  z-index: 5;
+}
+
+.formHero {
+  padding: 1.5rem 2.4rem 1.35rem;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  border: 1px solid rgba(15, 24, 48, 0.05);
+  box-shadow: var(--shadow-soft);
+  border-radius: var(--radius-lg);
+}
+
+.field select,
+.field input {
+  width: 100%;
+}
+
+.tabs {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+
+.tab {
+  cursor: pointer;
+}
+
+.tabInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.tabLabel {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.tabInput:checked + .tabLabel {
+  background: var(--navy-900);
+  color: var(--gold-400);
+}
+
+.tabInput:focus-visible + .tabLabel {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 2px;
+}
+
+.submitCell {
+  display: flex;
+}
+
+.submitBtn {
+  width: 100%;
+  justify-content: center;
+}
+
+.submitIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.quick {
+  grid-column: 1 / -1;
+  margin-top: 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.85rem;
+}
+
+.quickLabel {
+  color: var(--text-muted);
+}
+
+.quickList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quickPill {
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.quickPill:hover {
+  border-color: var(--gold-500);
+  color: var(--gold-strong, var(--gold-500));
+}
+
+@media (max-width: 900px) {
+  .formHero {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .formHero {
+    grid-template-columns: 1fr;
+  }
+}

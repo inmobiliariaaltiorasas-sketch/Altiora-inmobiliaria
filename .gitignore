@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# builds
+dist/
+.next/
+build/
+out/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# logs
+npm-debug.log*
+*.log
+
+# editors / os
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# prisma
+apps/api/prisma/dev.db
+
+# uploads (Fase 1: disco local — ver docs/decisiones-fase-1.md)
+apps/api/uploads/
+
+# misc
+.atl/

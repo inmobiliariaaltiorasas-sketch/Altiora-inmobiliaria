@@ -1,0 +1,81 @@
+.wrapper {
+  display: none;
+  position: relative;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 8px;
+  border: 1px solid rgba(217, 180, 88, 0.4);
+  background: transparent;
+  color: var(--cream);
+  cursor: pointer;
+}
+
+.icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  width: 78vw;
+  max-width: 20rem;
+  background: var(--navy-800);
+  border: 1px solid var(--gold-500);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.panelNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.panelLink {
+  color: #e6e2d2;
+  text-decoration: none;
+  padding: 0.6rem 0.3rem;
+  border-bottom: 1px solid rgba(230, 226, 210, 0.12);
+  font-size: 0.98rem;
+}
+
+.panelLink:last-child {
+  border-bottom: none;
+}
+
+.panelWhatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  background: var(--gold-500);
+  color: var(--navy-900);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.whatsappIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 900px) {
+  .wrapper {
+    display: block;
+  }
+}
