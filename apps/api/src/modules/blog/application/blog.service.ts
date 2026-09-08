@@ -8,6 +8,7 @@ import {
   type SupportedLocale,
 } from '@altiora/shared-types';
 import { slugify } from '../../../common/utils/slugify';
+import { DEMO_TITLE_MARKERS, hasDemoMarker } from '../../../common/utils/demo-content';
 import { WebRevalidationService } from '../../../common/services/web-revalidation.service';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { AuditLogsService } from '../../audit-logs/application/audit-logs.service';
@@ -18,6 +19,11 @@ const detailInclude = {
   author: { select: { name: true } },
   translations: true,
 } satisfies Prisma.BlogPostInclude;
+
+/** Excluye posts cuyo título (en cualquier idioma) tenga un marcador de contenido demo. */
+const excludeDemoBlogPosts: Prisma.BlogPostWhereInput[] = DEMO_TITLE_MARKERS.map((marker) => ({
+  translations: { some: { title: { contains: marker, mode: 'insensitive' } } },
+}));
 
 type BlogPostRow = Prisma.BlogPostGetPayload<{ include: typeof detailInclude }>;
 
@@ -31,7 +37,7 @@ export class BlogService {
 
   async listPublished(locale: SupportedLocale): Promise<BlogPostSummaryDto[]> {
     const posts = await this.prisma.blogPost.findMany({
-      where: { status: 'PUBLISHED' },
+      where: { status: 'PUBLISHED', NOT: excludeDemoBlogPosts },
       include: detailInclude,
       orderBy: { publishedAt: 'desc' },
     });
@@ -40,7 +46,8 @@ export class BlogService {
 
   async findPublicBySlugOrThrow(slug: string, locale: SupportedLocale): Promise<BlogPostDetailDto> {
     const post = await this.prisma.blogPost.findUnique({ where: { slug }, include: detailInclude });
-    if (!post || post.status !== 'PUBLISHED') {
+    const isDemo = post?.translations.some((t) => hasDemoMarker(t.title)) ?? false;
+    if (!post || post.status !== 'PUBLISHED' || isDemo) {
       throw new NotFoundException(`Artículo no encontrado: ${slug}`);
     }
     return this.toDetail(post, locale);
@@ -136,7 +143,7 @@ export class BlogService {
 
   async listSitemapEntries(): Promise<BlogSitemapEntryDto[]> {
     const posts = await this.prisma.blogPost.findMany({
-      where: { status: 'PUBLISHED' },
+      where: { status: 'PUBLISHED', NOT: excludeDemoBlogPosts },
       select: { slug: true, updatedAt: true },
     });
     return posts.map((post) => ({ slug: post.slug, updatedAt: post.updatedAt.toISOString() }));

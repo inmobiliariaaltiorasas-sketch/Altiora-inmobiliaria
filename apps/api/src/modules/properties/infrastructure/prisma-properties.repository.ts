@@ -11,6 +11,7 @@ import {
   type PropertySummaryDto,
 } from '@altiora/shared-types';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import { DEMO_TITLE_MARKERS } from '../../../common/utils/demo-content';
 import type {
   CreatePropertyInput,
   PropertiesRepository,
@@ -18,6 +19,11 @@ import type {
   PropertySnapshot,
   UpdatePropertyInput,
 } from '../domain/properties.repository';
+
+/** Excluye propiedades cuyo título (en cualquier idioma) tenga un marcador de contenido demo. */
+const excludeDemoProperties: Prisma.PropertyWhereInput[] = DEMO_TITLE_MARKERS.map((marker) => ({
+  translations: { some: { title: { contains: marker, mode: 'insensitive' } } },
+}));
 
 const propertyInclude = {
   city: true,
@@ -37,6 +43,7 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
   async search(filters: PropertySearchFilters): Promise<PropertySearchResultDto> {
     const where: Prisma.PropertyWhereInput = {
       status: filters.includeUnpublished ? undefined : 'PUBLISHED',
+      NOT: filters.includeUnpublished ? undefined : excludeDemoProperties,
       city: filters.citySlug ? { slug: filters.citySlug } : undefined,
       neighborhood: filters.neighborhoodSlug ? { slug: filters.neighborhoodSlug } : undefined,
       propertyType: filters.propertyTypeSlug ? { slug: filters.propertyTypeSlug } : undefined,
@@ -71,10 +78,12 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
 
   async findPublicBySlug(slug: string, locale: SupportedLocale): Promise<PropertyDetailDto | null> {
     const property = await this.prisma.property.findFirst({
-      where: { slug, status: 'PUBLISHED' },
+      where: { slug, status: 'PUBLISHED', NOT: excludeDemoProperties },
       include: propertyInclude,
     });
-    return property ? this.toDetail(property, locale, await this.findRelated(property)) : null;
+    return property
+      ? this.toDetail(property, locale, await this.findRelated(property, true))
+      : null;
   }
 
   async findAdminById(id: string, locale: SupportedLocale): Promise<PropertyDetailDto | null> {
@@ -82,7 +91,9 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
       where: { id },
       include: propertyInclude,
     });
-    return property ? this.toDetail(property, locale, await this.findRelated(property)) : null;
+    return property
+      ? this.toDetail(property, locale, await this.findRelated(property, false))
+      : null;
   }
 
   async existsBySlug(slug: string): Promise<boolean> {
@@ -192,19 +203,23 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
 
   async listSitemapEntries(): Promise<PropertySitemapEntryDto[]> {
     const properties = await this.prisma.property.findMany({
-      where: { status: 'PUBLISHED' },
+      where: { status: 'PUBLISHED', NOT: excludeDemoProperties },
       select: { slug: true, updatedAt: true },
     });
     return properties.map((p) => ({ slug: p.slug, updatedAt: p.updatedAt.toISOString() }));
   }
 
-  private async findRelated(property: PropertyWithRelations): Promise<PropertyWithRelations[]> {
+  private async findRelated(
+    property: PropertyWithRelations,
+    excludeDemo: boolean,
+  ): Promise<PropertyWithRelations[]> {
     return this.prisma.property.findMany({
       where: {
         id: { not: property.id },
         status: 'PUBLISHED',
         cityId: property.cityId,
         propertyTypeId: property.propertyTypeId,
+        NOT: excludeDemo ? excludeDemoProperties : undefined,
       },
       include: propertyInclude,
       take: 4,
