@@ -4,19 +4,25 @@
   margin-top: 4rem;
 }
 
-.inner {
-  padding: 2.4rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1.75rem;
+.grid {
+  padding: 4rem 1.5rem 3rem;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 3rem;
 }
 
 .brand {
   display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 24rem;
+}
+
+.brandLink {
+  display: flex;
   align-items: center;
   gap: 0.7rem;
+  text-decoration: none;
 }
 
 .logo {
@@ -26,32 +32,64 @@
 .brandName {
   font-family: var(--font-fraunces), serif;
   color: var(--cream);
-  font-size: 1.05rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
 }
 
-.note {
-  font-size: 0.82rem;
-  margin-top: 0.15rem;
+.description {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.columnTitle {
+  color: var(--gold-400);
+}
+
+.linkList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.linkList a {
+  color: #c4c9de;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.linkList a:hover {
+  color: var(--gold-400);
 }
 
 .contact {
   list-style: none;
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.4rem;
+  flex-direction: column;
+  gap: 0.75rem;
   margin: 0;
   padding: 0;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
 }
 
 .contact li {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: flex-start;
+  gap: 0.55rem;
 }
 
 .contact a {
-  color: #9aa3c2;
+  color: #c4c9de;
   text-decoration: none;
 }
 
@@ -60,10 +98,11 @@
 }
 
 .icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1.05rem;
+  height: 1.05rem;
   color: var(--gold-500);
   flex: none;
+  margin-top: 0.1rem;
 }
 
 .social {
@@ -78,7 +117,7 @@
   width: 2.1rem;
   height: 2.1rem;
   border-radius: 999px;
-  border: 1px solid rgba(217, 180, 88, 0.35);
+  border: 1px solid rgba(184, 154, 103, 0.35);
   color: var(--cream);
   transition:
     background 0.15s ease,
@@ -97,20 +136,26 @@
 
 .legal {
   border-top: 1px solid rgba(154, 163, 194, 0.18);
-  padding: 1rem 1.5rem;
+  padding: 1.25rem 1.5rem;
   text-align: center;
   font-size: 0.78rem;
 }
 
-@media (max-width: 640px) {
-  .inner {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .contact {
-    flex-direction: column;
-    gap: 0.6rem;
+  .brand {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 3rem 1.25rem 2.5rem;
+    gap: 2.25rem;
   }
 }

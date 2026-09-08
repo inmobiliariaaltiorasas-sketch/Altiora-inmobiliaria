@@ -18,7 +18,7 @@ export function LocaleSwitcher({ locale, label }: { locale: SupportedLocale; lab
           {index > 0 ? (
             <span
               aria-hidden="true"
-              style={{ color: 'rgba(230,226,210,0.25)', fontSize: '0.7rem' }}
+              style={{ color: 'var(--border)', fontSize: '0.7rem' }}
             >
               /
             </span>
@@ -31,7 +31,7 @@ export function LocaleSwitcher({ locale, label }: { locale: SupportedLocale; lab
               fontFamily: 'var(--font-plex-mono), monospace',
               letterSpacing: '0.05em',
               textDecoration: 'none',
-              color: candidate === locale ? 'var(--gold-400, #d9b458)' : 'rgba(230,226,210,0.55)',
+              color: candidate === locale ? 'var(--navy-900)' : 'var(--text-muted)',
               fontWeight: candidate === locale ? 600 : 400,
             }}
           >

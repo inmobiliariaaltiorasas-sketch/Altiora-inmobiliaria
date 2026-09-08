@@ -2,16 +2,22 @@
   "nav": {
     "home": "Inicio",
     "properties": "Propiedades",
-    "cities": "Ciudades",
+    "cities": "Zonas",
     "projects": "Proyectos",
     "blog": "Blog",
     "about": "Nosotros",
     "contact": "Contacto",
     "tagline": "Construcciones e Inmobiliaria",
-    "whatsappCta": "Hablar por WhatsApp",
+    "whatsappCta": "Hablar con un asesor",
     "mainNav": "Navegación principal"
   },
   "footer": {
+    "description": "Acompañamos procesos de compra, venta y arriendo de propiedades en Cartago y el norte del Valle del Cauca.",
+    "linksTitle": "Navegación",
+    "contactTitle": "Contacto",
+    "whatsapp": "Escribinos por WhatsApp",
+    "buy": "Comprar",
+    "rent": "Arrendar",
     "rights": "Todos los derechos reservados.",
     "note": "Cartago, Valle del Cauca, Colombia."
   },

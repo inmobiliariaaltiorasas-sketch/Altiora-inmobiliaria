@@ -1,15 +1,16 @@
 :root {
-  --navy-900: #0f1830;
-  --navy-800: #182548;
-  --navy-700: #223061;
-  --gold-500: #c9a227;
-  --gold-400: #d9b458;
-  --paper: #f6f3ea;
+  /* Paleta premium editorial (rediseño Fase 1): navy petróleo + champagne discreto sobre marfil. */
+  --navy-900: #172033;
+  --navy-800: #252a35;
+  --navy-700: #37404f;
+  --gold-500: #b89a67;
+  --gold-400: #c9b183;
+  --paper: #f7f5f0;
   --surface: #ffffff;
   --surface-2: #efe9d8;
   --border: #ded4b8;
-  --text: #1a1f32;
-  --text-muted: #565f7a;
+  --text: #16191f;
+  --text-muted: #666a73;
   --cream: #f6f1de;
   --cream-muted: #c7cee6;
   --radius: 10px;

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { HeaderScrollEffect } from './HeaderScrollEffect';
 import { LocaleSwitcher } from './LocaleSwitcher';
 import { MobileNavToggle } from './MobileNavToggle';
 import { WhatsAppIcon } from '@/components/ui/icons';
@@ -16,7 +17,6 @@ export async function Header({ locale }: { locale: SupportedLocale }) {
     { href: `/${locale}`, label: t('home') },
     { href: `/${locale}/propiedades`, label: t('properties'), hasChevron: true },
     { href: `/${locale}/ciudades`, label: t('cities'), hasChevron: true },
-    { href: `/${locale}/proyectos`, label: t('projects') },
     { href: `/${locale}/blog`, label: t('blog') },
     { href: `/${locale}/nosotros`, label: t('about') },
     { href: `/${locale}/contacto`, label: t('contact') },
@@ -29,7 +29,8 @@ export async function Header({ locale }: { locale: SupportedLocale }) {
   );
 
   return (
-    <header className={styles.header}>
+    <header id="site-header" className={styles.header} data-scrolled="false">
+      <HeaderScrollEffect />
       <div className={`container ${styles.bar}`}>
         <Link href={`/${locale}`} className={styles.brand} aria-label="ALTiora — Inicio">
           <Image

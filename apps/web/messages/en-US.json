@@ -2,16 +2,22 @@
   "nav": {
     "home": "Home",
     "properties": "Properties",
-    "cities": "Cities",
+    "cities": "Areas",
     "projects": "Projects",
     "blog": "Blog",
     "about": "About",
     "contact": "Contact",
     "tagline": "Construction & Real Estate",
-    "whatsappCta": "Chat on WhatsApp",
+    "whatsappCta": "Talk to an advisor",
     "mainNav": "Main navigation"
   },
   "footer": {
+    "description": "We support buying, selling and renting properties in Cartago and northern Valle del Cauca.",
+    "linksTitle": "Navigation",
+    "contactTitle": "Contact",
+    "whatsapp": "Chat on WhatsApp",
+    "buy": "Buy",
+    "rent": "Rent",
     "rights": "All rights reserved.",
     "note": "Cartago, Valle del Cauca, Colombia."
   },
