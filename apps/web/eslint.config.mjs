@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import { baseConfig } from '../../packages/config/eslint.base.mjs';
 
 export default [
-  { ignores: ['next-env.d.ts'] },
+  { ignores: ['next-env.d.ts', '.open-next/**'] },
   ...baseConfig,
   {
     plugins: { '@next/next': nextPlugin, 'react-hooks': reactHooks },
