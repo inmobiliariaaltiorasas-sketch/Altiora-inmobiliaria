@@ -69,26 +69,41 @@ const COPY: Record<
   ],
 };
 
+/**
+ * Composición editorial en vez de 4 cards idénticas: cada ítem es una fila a todo el ancho,
+ * con fondo y dirección alternados (marfil/blanco, izquierda/derecha) — sin fotografía real
+ * disponible para estos 4 destinos, el "bloque visual" es un círculo grande con ícono en vez
+ * de forzar una imagen de stock.
+ */
 export function ResourcesBlock({ locale }: { locale: SupportedLocale }) {
   const items = COPY[locale];
 
   return (
     <section className={styles.section}>
-      <div className={`container ${styles.grid}`}>
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div key={item.title} className={styles.item}>
-              <Icon className={styles.icon} aria-hidden="true" />
-              <h3 className={styles.title}>{item.title}</h3>
-              <p className={styles.body}>{item.body}</p>
-              <Link href={item.href} className={styles.cta}>
-                {item.cta} →
-              </Link>
+      {items.map((item, index) => {
+        const Icon = item.icon;
+        const reversed = index % 2 === 1;
+        return (
+          <div
+            key={item.title}
+            className={`${styles.row} ${reversed ? styles.rowReversed : ''}`}
+            data-tone={index % 2 === 0 ? 'paper' : 'surface'}
+          >
+            <div className={`container ${styles.rowInner}`}>
+              <div className={styles.visual} aria-hidden="true">
+                <Icon className={styles.icon} />
+              </div>
+              <div className={styles.copy}>
+                <h3 className={styles.title}>{item.title}</h3>
+                <p className={styles.body}>{item.body}</p>
+                <Link href={item.href} className={styles.cta}>
+                  {item.cta} →
+                </Link>
+              </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
     </section>
   );
 }

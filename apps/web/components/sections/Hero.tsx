@@ -1,7 +1,5 @@
 import Image from 'next/image';
-import type { PropertySummaryDto, SupportedLocale } from '@altiora/shared-types';
-import { HouseIcon, ShieldCheckIcon, UsersIcon } from '@/components/ui/icons';
-import { HeroSlider } from './HeroSlider';
+import type { SupportedLocale } from '@altiora/shared-types';
 import styles from './Hero.module.css';
 
 const COPY: Record<
@@ -10,50 +8,33 @@ const COPY: Record<
     eyebrow: string;
     title: string;
     subtitle: string;
-    benefits: Array<{ title: string; body: string }>;
-    ctaProperty: string;
   }
 > = {
   'es-CO': {
-    eyebrow: 'Encuentra tu próximo hogar',
-    title: 'Casas y apartamentos en Cartago',
+    eyebrow: 'ALTIORA INMOBILIARIA',
+    title: 'Encuentra el lugar donde\ncomienza tu próxima historia',
     subtitle:
-      'Propiedades verificadas, precios reales y asesoría personalizada para que tomes la mejor decisión.',
-    benefits: [
-      { title: 'Precios reales', body: 'y visibles' },
-      { title: 'Propiedades', body: 'verificadas' },
-      { title: 'Asesoría', body: 'en cada paso' },
-    ],
-    ctaProperty: 'Ver propiedad',
+      'Casas, apartamentos, lotes y proyectos seleccionados en Cartago y el norte del Valle.',
   },
   'en-US': {
-    eyebrow: 'Find your next home',
-    title: 'Houses and apartments in Cartago',
+    eyebrow: 'ALTIORA REAL ESTATE',
+    title: 'Find the place where\nyour next story begins',
     subtitle:
-      'Verified properties, real prices and personalized guidance to help you make the best decision.',
-    benefits: [
-      { title: 'Real prices', body: 'always visible' },
-      { title: 'Verified', body: 'properties' },
-      { title: 'Guidance', body: 'every step' },
-    ],
-    ctaProperty: 'View property',
+      'Houses, apartments, lots and selected projects in Cartago and northern Valle del Cauca.',
   },
 };
 
-const BENEFIT_ICONS = [HouseIcon, ShieldCheckIcon, UsersIcon];
-
-export function Hero({
-  locale,
-  featured,
-}: {
-  locale: SupportedLocale;
-  featured: PropertySummaryDto[];
-}) {
+/**
+ * Solo foto + titular + buscador (este último vive en page.tsx, superpuesto al borde
+ * inferior del Hero) — sin card de propiedad flotante ni indicadores dentro de la foto,
+ * para que la primera pantalla se sienta como la referencia premium: fotografía protagonista.
+ */
+export function Hero({ locale }: { locale: SupportedLocale }) {
   const copy = COPY[locale];
 
   return (
     <section className={styles.hero}>
-      <Image src="/hero-property.jpg" alt="" fill priority sizes="100vw" className={styles.photo} />
+      <Image src="/hero-home.png" alt="" fill priority sizes="100vw" className={styles.photo} />
       <div className={styles.texture} aria-hidden="true" />
       <div className={styles.overlay} aria-hidden="true" />
 
@@ -61,25 +42,7 @@ export function Hero({
         <span className={`eyebrow ${styles.eyebrow}`}>—{copy.eyebrow}</span>
         <h1 className={styles.title}>{copy.title}</h1>
         <p className={styles.subtitle}>{copy.subtitle}</p>
-
-        <ul className={styles.benefits}>
-          {copy.benefits.map((benefit, index) => {
-            const Icon = BENEFIT_ICONS[index] ?? HouseIcon;
-            return (
-              <li key={benefit.title} className={styles.benefit}>
-                <Icon className={styles.benefitIcon} aria-hidden="true" />
-                <span>
-                  {benefit.title}
-                  <br />
-                  {benefit.body}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
       </div>
-
-      <HeroSlider locale={locale} slides={featured.slice(0, 3)} ctaLabel={copy.ctaProperty} />
     </section>
   );
 }

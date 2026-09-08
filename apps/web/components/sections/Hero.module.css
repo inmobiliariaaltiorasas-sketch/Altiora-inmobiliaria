@@ -25,28 +25,55 @@
 .photo {
   z-index: 0;
   object-fit: cover;
-  object-position: center 38%;
+  /* Desktop por defecto: conserva techo/voladizo, fachada acristalada y jardín. */
+  object-position: center 42%;
+}
+
+/* La foto real (hero-home.png) es horizontal: fachada + jardín abajo, cielo arriba.
+   Estas variantes evitan que el recorte "cover" pierda el volumen de la casa o el
+   jardín al achicarse el viewport — la prioridad siempre es la fachada iluminada. */
+@media (max-width: 900px) {
+  .photo {
+    object-position: center 40%;
+  }
+}
+
+@media (max-width: 640px) {
+  .photo {
+    object-position: center 48%;
+  }
 }
 
 .texture {
   position: absolute;
   inset: 0;
   z-index: 1;
+  /* Oscurecimiento suave y no uniforme: la foto debe seguir viéndose con claridad
+     (arquitectura, ventanales, luz cálida, jardín, cielo), no una capa negra pareja. */
   background:
-    radial-gradient(circle at 12% 18%, rgba(217, 180, 88, 0.14), transparent 42%),
-    radial-gradient(circle at 88% 75%, rgba(217, 180, 88, 0.06), transparent 46%),
-    linear-gradient(165deg, rgba(15, 24, 48, 0.32) 0%, rgba(15, 24, 48, 0.55) 100%);
+    radial-gradient(circle at 12% 16%, rgba(201, 177, 131, 0.12), transparent 45%),
+    radial-gradient(circle at 88% 22%, rgba(201, 177, 131, 0.05), transparent 50%),
+    linear-gradient(
+      180deg,
+      rgba(23, 32, 51, 0.18) 0%,
+      rgba(23, 32, 51, 0.06) 30%,
+      rgba(23, 32, 51, 0.08) 60%,
+      rgba(23, 32, 51, 0.26) 100%
+    );
 }
 
 .overlay {
   position: absolute;
   inset: 0;
   z-index: 2;
+  /* Gradiente direccional localizado en la mitad izquierda (donde cae el texto),
+     se disuelve hacia la derecha para dejar la fachada y el jardín despejados. */
   background: linear-gradient(
-    100deg,
-    rgba(8, 13, 27, 0.84) 0%,
-    rgba(8, 13, 27, 0.5) 46%,
-    rgba(8, 13, 27, 0.14) 78%
+    110deg,
+    rgba(23, 32, 51, 0.4) 0%,
+    rgba(23, 32, 51, 0.24) 34%,
+    rgba(23, 32, 51, 0.06) 62%,
+    rgba(23, 32, 51, 0) 80%
   );
 }
 
@@ -55,7 +82,7 @@
   z-index: 3;
   margin: 0;
   padding: 4rem 1.5rem 1.5rem;
-  max-width: 44rem;
+  max-width: 56rem;
 }
 
 .eyebrow {
@@ -67,11 +94,12 @@
 }
 
 .title {
-  font-size: clamp(2.1rem, 5vw, 3.4rem);
-  line-height: 1.08;
+  font-size: clamp(2.375rem, 6vw, 5.125rem);
+  line-height: 1.03;
   letter-spacing: -0.01em;
   margin-top: 0.75rem;
   text-wrap: balance;
+  white-space: pre-line;
   color: var(--cream);
 }
 
@@ -84,41 +112,9 @@
   max-width: 32rem;
 }
 
-.benefits {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  margin: 2.1rem 0 0;
-  padding: 0;
-}
-
-.benefit {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-size: 0.85rem;
-  color: #dfe3f2;
-  line-height: 1.35;
-}
-
-@media (min-width: 641px) {
-  .benefit:not(:first-child) {
-    border-left: 1px solid rgba(217, 180, 88, 0.3);
-    padding-left: 2rem;
-  }
-}
-
-.benefitIcon {
-  width: 1.6rem;
-  height: 1.6rem;
-  color: var(--gold-400);
-  flex: none;
-}
-
 @media (min-width: 901px) {
   .hero {
-    min-height: 28rem;
+    min-height: clamp(36rem, 84vh, 50rem);
   }
 
   .content {
@@ -136,8 +132,3 @@
   }
 }
 
-@media (max-width: 640px) {
-  .benefits {
-    gap: 1.1rem;
-  }
-}

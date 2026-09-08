@@ -11,10 +11,10 @@
 }
 
 .formHero {
-  padding: 1.5rem 2.4rem 1.35rem;
-  grid-template-columns: repeat(5, 1fr);
+  padding: 1.75rem 2.75rem 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
   align-items: end;
-  border: 1px solid rgba(15, 24, 48, 0.05);
+  border: 1px solid rgba(23, 32, 51, 0.05);
   box-shadow: var(--shadow-soft);
   border-radius: var(--radius-lg);
 }
@@ -71,11 +71,129 @@
 .submitBtn {
   width: 100%;
   justify-content: center;
+  background: var(--navy-900);
+  color: #ffffff;
+}
+
+.submitBtn:hover {
+  background: var(--navy-800);
 }
 
 .submitIcon {
   width: 1rem;
   height: 1rem;
+}
+
+.priceRange {
+  position: relative;
+}
+
+.priceSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  cursor: pointer;
+  list-style: none;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.priceSummary::-webkit-details-marker {
+  display: none;
+}
+
+.priceSummary::after {
+  content: '▾';
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.priceRange[open] .priceSummary::after {
+  content: '▴';
+}
+
+.priceSummary:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 2px;
+}
+
+.pricePopover {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 20;
+  min-width: 16rem;
+  max-width: min(20rem, calc(100vw - 3rem));
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.popoverField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.popoverField input {
+  font: inherit;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.popoverField input:focus {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 1px;
+}
+
+.moreFilters {
+  grid-column: 1 / -1;
+  margin-top: 0.35rem;
+}
+
+.moreFilters summary {
+  cursor: pointer;
+  list-style: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0;
+  width: fit-content;
+}
+
+.moreFilters summary::-webkit-details-marker {
+  display: none;
+}
+
+.moreFilters summary::before {
+  content: '+ ';
+  color: var(--gold-500);
+}
+
+.moreFilters[open] summary::before {
+  content: '– ';
+}
+
+.moreFilters .field {
+  margin-top: 0.75rem;
+  max-width: 14rem;
 }
 
 .quick {

@@ -3,6 +3,46 @@
   margin-top: -4.5rem;
 }
 
+.trustLine {
+  margin: 1.1rem 0 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+}
+
+.featuredHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.featuredTitle {
+  margin-top: 0.6rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  max-width: 32rem;
+}
+
+.featuredIntro {
+  margin-top: 0.6rem;
+  color: var(--text-muted);
+  max-width: 34rem;
+  font-size: 0.95rem;
+}
+
+.seeAllLink {
+  white-space: nowrap;
+}
+
+.propertyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.5rem;
+}
+
 .brandSection {
   padding: 0 1.5rem clamp(3.5rem, 7vw, 6rem);
 }
@@ -20,5 +60,9 @@
 
   .brandSection {
     padding: 0 1.25rem 2.5rem;
+  }
+
+  .featuredHeader {
+    align-items: flex-start;
   }
 }

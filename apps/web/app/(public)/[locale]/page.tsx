@@ -7,6 +7,7 @@ import { Hero } from '@/components/sections/Hero';
 import { ResourcesBlock } from '@/components/sections/ResourcesBlock';
 import { WhyAltiora } from '@/components/sections/WhyAltiora';
 import { BrandBlock } from '@/components/sections/BrandBlock';
+import { SellPropertySection } from '@/components/sections/SellPropertySection';
 import { FinalCta } from '@/components/sections/FinalCta';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
@@ -17,21 +18,36 @@ const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
 const COPY: Record<
   SupportedLocale,
-  { title: string; description: string; featured: string; seeAll: string }
+  {
+    title: string;
+    description: string;
+    featuredEyebrow: string;
+    featuredTitle: string;
+    featuredIntro: string;
+    seeAll: string;
+    trustItems: string[];
+  }
 > = {
   'es-CO': {
     title: 'ALTiora — Casas y apartamentos en Cartago, Valle del Cauca',
     description:
       'Propiedades verificadas en Cartago con precios reales y visibles, sin registro. Busca casas, apartamentos y lotes, y habla con un asesor cuando vos decidas.',
-    featured: 'Propiedades destacadas',
-    seeAll: 'Ver todas →',
+    featuredEyebrow: 'SELECCIÓN ALTIORA',
+    featuredTitle: 'Propiedades que vale la pena descubrir',
+    featuredIntro:
+      'Una selección de inmuebles pensados para diferentes estilos de vida e inversión.',
+    seeAll: 'Ver todas las propiedades →',
+    trustItems: ['Precios reales y visibles', 'Propiedades verificadas', 'Asesoría en cada paso'],
   },
   'en-US': {
     title: 'ALTiora — Houses and apartments in Cartago, Valle del Cauca',
     description:
       'Verified properties in Cartago with real, visible prices and no sign-up required. Search houses, apartments and lots, and talk to an advisor whenever you decide.',
-    featured: 'Featured properties',
-    seeAll: 'See all →',
+    featuredEyebrow: 'ALTIORA SELECTION',
+    featuredTitle: 'Properties worth discovering',
+    featuredIntro: 'A selection of properties for different lifestyles and investment goals.',
+    seeAll: 'View all properties →',
+    trustItems: ['Real, visible prices', 'Verified properties', 'Guidance every step'],
   },
 };
 
@@ -111,7 +127,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <main>
-      <Hero locale={locale} featured={results.items} />
+      <Hero locale={locale} />
 
       <div className={`container ${styles.searchOverlap}`}>
         <PropertySearchForm
@@ -121,44 +137,33 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           variant="hero"
           quickSearches={quickSearches}
         />
+        <p className={styles.trustLine}>{copy.trustItems.join(' · ')}</p>
       </div>
 
-      <section className={`container section`}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-          }}
-        >
-          <h2 style={{ fontSize: '1.6rem' }}>{copy.featured}</h2>
-          <Link
-            href={`/${locale}/propiedades`}
-            style={{ color: 'var(--gold-500)', textDecoration: 'none', fontWeight: 600 }}
-          >
-            {copy.seeAll}
-          </Link>
-        </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-            gap: '1.5rem',
-            marginTop: '1.5rem',
-          }}
-        >
-          {results.items.map((property) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              locale={locale}
-              featured={property.isFeatured}
-            />
-          ))}
-        </div>
-      </section>
+      {results.items.length > 0 ? (
+        <section className={`container section`}>
+          <div className={styles.featuredHeader}>
+            <div>
+              <span className="eyebrow">{copy.featuredEyebrow}</span>
+              <h2 className={styles.featuredTitle}>{copy.featuredTitle}</h2>
+              <p className={styles.featuredIntro}>{copy.featuredIntro}</p>
+            </div>
+            <Link href={`/${locale}/propiedades`} className={`btn btn-outline ${styles.seeAllLink}`}>
+              {copy.seeAll}
+            </Link>
+          </div>
+          <div className={styles.propertyGrid}>
+            {results.items.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                locale={locale}
+                featured={property.isFeatured}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <ResourcesBlock locale={locale} />
 
@@ -169,6 +174,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section className={`container ${styles.brandSection}`}>
         <BrandBlock />
       </section>
+
+      <SellPropertySection locale={locale} />
 
       <FinalCta locale={locale} />
     </main>
