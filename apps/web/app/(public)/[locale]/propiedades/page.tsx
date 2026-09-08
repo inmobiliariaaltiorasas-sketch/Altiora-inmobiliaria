@@ -6,13 +6,20 @@ import { PropertySearchForm } from '@/components/blocks/PropertySearchForm';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getPropertyTypes } from '@/lib/api/catalog';
+import { buildWhatsAppLink } from '@/lib/whatsapp';
+import styles from './page.module.css';
 
 const COPY: Record<
   SupportedLocale,
   {
     title: string;
     description: string;
-    empty: string;
+    emptyFiltered: string;
+    resetFilters: string;
+    emptyCatalogTitle: string;
+    emptyCatalogBody: string;
+    emptyCatalogContactCta: string;
+    emptyCatalogWhatsappCta: string;
     previous: string;
     next: string;
     results: (n: number) => string;
@@ -22,8 +29,14 @@ const COPY: Record<
     title: 'Propiedades en venta y arriendo en Cartago',
     description:
       'Catálogo completo de propiedades en Cartago, Valle del Cauca, con precios y disponibilidad reales.',
-    empty:
+    emptyFiltered:
       'No encontramos propiedades con esos filtros. Probá ampliando el rango de precio o cambiando la ciudad.',
+    resetFilters: 'Quitar filtros',
+    emptyCatalogTitle: 'Próximamente nuevas propiedades',
+    emptyCatalogBody:
+      'Estamos preparando nuevas oportunidades inmobiliarias en Cartago y sus alrededores. Muy pronto vas a encontrar acá propiedades seleccionadas por Altiora.',
+    emptyCatalogContactCta: 'Contactar a un asesor',
+    emptyCatalogWhatsappCta: 'Hablar por WhatsApp',
     previous: '← Anterior',
     next: 'Siguiente →',
     results: (n) => `${n} propiedades encontradas`,
@@ -32,8 +45,14 @@ const COPY: Record<
     title: 'Properties for sale and rent in Cartago',
     description:
       'Full catalog of properties in Cartago, Valle del Cauca, with real prices and availability.',
-    empty:
+    emptyFiltered:
       'No properties matched those filters. Try widening the price range or changing the city.',
+    resetFilters: 'Clear filters',
+    emptyCatalogTitle: 'New properties coming soon',
+    emptyCatalogBody:
+      "We're preparing new real estate opportunities in Cartago and the surrounding area. You'll soon find properties selected by Altiora here.",
+    emptyCatalogContactCta: 'Talk to an advisor',
+    emptyCatalogWhatsappCta: 'Chat on WhatsApp',
     previous: '← Previous',
     next: 'Next →',
     results: (n) => `${n} properties found`,
@@ -87,6 +106,28 @@ export default async function PropertiesSearchPage({
     return `/${locale}/propiedades?${query.toString()}`;
   };
 
+  /**
+   * Con 0 resultados hay que distinguir "no hay ningún inmueble publicado" de "estos filtros no
+   * matchean nada" — son estados de negocio distintos y el copy no puede ser el mismo. Si ya se
+   * aplicó algún filtro, un segundo fetch liviano (pageSize:1, sin filtros) confirma si el
+   * catálogo global tiene contenido; sin filtros, el propio resultado ya lo confirma.
+   */
+  let catalogHasPublishedProperties = true;
+  if (results.items.length === 0) {
+    const hasFilters = Boolean(
+      sp.city || sp.type || sp.operation || sp.minPrice || sp.maxPrice || sp.minBedrooms,
+    );
+    catalogHasPublishedProperties = hasFilters
+      ? (await searchProperties({ locale, pageSize: 1 })).total > 0
+      : false;
+  }
+
+  const whatsappLink = buildWhatsAppLink(
+    locale === 'es-CO'
+      ? 'Hola, quisiera recibir asesoría para encontrar una propiedad.'
+      : 'Hi, I would like guidance to find a property.',
+  );
+
   return (
     <main className="container" style={{ padding: '2.5rem 1.5rem' }}>
       <h1 style={{ fontSize: '1.9rem' }}>{copy.title}</h1>
@@ -101,12 +142,36 @@ export default async function PropertiesSearchPage({
         />
       </div>
 
-      <p style={{ color: 'var(--text-muted)', marginTop: '1.5rem', fontSize: '0.9rem' }}>
-        {copy.results(results.total)}
-      </p>
+      {catalogHasPublishedProperties ? (
+        <p style={{ color: 'var(--text-muted)', marginTop: '1.5rem', fontSize: '0.9rem' }}>
+          {copy.results(results.total)}
+        </p>
+      ) : null}
 
       {results.items.length === 0 ? (
-        <p style={{ marginTop: '1rem' }}>{copy.empty}</p>
+        catalogHasPublishedProperties ? (
+          <div className={styles.filteredEmpty}>
+            <p>{copy.emptyFiltered}</p>
+            <Link href={`/${locale}/propiedades`} className="btn btn-outline">
+              {copy.resetFilters}
+            </Link>
+          </div>
+        ) : (
+          <div className={styles.emptyState}>
+            <h2 className={styles.emptyTitle}>{copy.emptyCatalogTitle}</h2>
+            <p className={styles.emptyBody}>{copy.emptyCatalogBody}</p>
+            <div className={styles.emptyActions}>
+              <Link href={`/${locale}/contacto`} className="btn btn-primary">
+                {copy.emptyCatalogContactCta}
+              </Link>
+              {whatsappLink ? (
+                <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+                  {copy.emptyCatalogWhatsappCta}
+                </a>
+              ) : null}
+            </div>
+          </div>
+        )
       ) : (
         <div
           style={{
