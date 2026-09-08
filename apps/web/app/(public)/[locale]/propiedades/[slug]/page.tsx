@@ -1,13 +1,19 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { getPropertyBySlug } from '@/lib/api/properties';
 import { getFxRateUsdCop } from '@/lib/api/settings';
 import { resolveMediaUrl } from '@/lib/api-client';
 import { PropertyCard } from '@/components/blocks/PropertyCard';
-import { PropertyInquirySection } from '@/components/blocks/PropertyInquirySection';
+import { PropertyGallery } from '@/components/blocks/PropertyGallery';
+import { PropertyContactCard } from '@/components/blocks/PropertyContactCard';
+import { PropertyMobileStickyBar } from '@/components/blocks/PropertyMobileStickyBar';
+import { PropertyLocationMap } from '@/components/blocks/PropertyLocationMap';
+import { FavoriteButton } from '@/components/ui/FavoriteButton';
+import { ShareButton } from '@/components/ui/ShareButton';
 import { formatArea, formatPrice, formatUsdEstimate } from '@/lib/format';
+import styles from './page.module.css';
 
 const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
@@ -23,9 +29,14 @@ const COPY: Record<
     description: string;
     features: string;
     related: string;
+    location: string;
+    breadcrumbHome: string;
     breadcrumbProperties: string;
     updatedAt: string;
     usdEstimate: string;
+    favorite: string;
+    share: string;
+    shareCopied: string;
     availability: Record<string, string>;
   }
 > = {
@@ -39,9 +50,14 @@ const COPY: Record<
     description: 'Descripción',
     features: 'Características',
     related: 'Propiedades relacionadas',
+    location: 'Ubicación',
+    breadcrumbHome: 'Inicio',
     breadcrumbProperties: 'Propiedades',
     updatedAt: 'Actualizado el',
     usdEstimate: 'Estimado (conversión informativa, no oficial)',
+    favorite: 'Guardar en favoritos',
+    share: 'Compartir',
+    shareCopied: 'Link copiado',
     availability: {
       DRAFT: 'Borrador',
       PUBLISHED: 'Disponible',
@@ -60,9 +76,14 @@ const COPY: Record<
     description: 'Description',
     features: 'Features',
     related: 'Related properties',
+    location: 'Location',
+    breadcrumbHome: 'Home',
     breadcrumbProperties: 'Properties',
     updatedAt: 'Updated on',
     usdEstimate: 'Estimate (informational conversion, not official)',
+    favorite: 'Save to favorites',
+    share: 'Share',
+    shareCopied: 'Link copied',
     availability: {
       DRAFT: 'Draft',
       PUBLISHED: 'Available',
@@ -132,6 +153,10 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
     locale === 'en-US' ? formatUsdEstimate(property.price, property.currency, fxRate) : null;
   const translation = resolveTranslation(property, locale);
   const canonical = `${WEB_URL}/${locale}/propiedades/${slug}`;
+  const propertyTitle = translation?.title ?? slug;
+  const locationLabel = property.location.neighborhood
+    ? `${property.location.neighborhood.name}, ${property.location.city.name}`
+    : `${property.location.city.name}, ${property.location.city.department}`;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -169,80 +194,63 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
   };
 
   return (
-    <main className="container" style={{ padding: '2rem 1.5rem 3rem' }}>
+    <main className={`container ${styles.main}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <span className="badge">{copy.availability[property.status]}</span>
-      <h1 style={{ fontSize: '1.9rem', marginTop: '0.6rem' }}>{translation?.title}</h1>
-      <p style={{ color: 'var(--text-muted)' }}>
-        {property.location.neighborhood ? `${property.location.neighborhood.name}, ` : ''}
-        {property.location.city.name}, {property.location.city.department}
-      </p>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
+      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+        <Link href={`/${locale}`}>{copy.breadcrumbHome}</Link>
+        <span aria-hidden="true">/</span>
+        <Link href={`/${locale}/propiedades`}>{copy.breadcrumbProperties}</Link>
+        <span aria-hidden="true">/</span>
+        <Link href={`/${locale}/ciudades/${property.location.city.slug}`}>
+          {property.location.city.name}
+        </Link>
+        <span aria-hidden="true">/</span>
+        <span className={styles.breadcrumbCurrent}>{propertyTitle}</span>
+      </nav>
+
+      <div className={styles.titleRow}>
+        <div>
+          <span className="badge">{copy.availability[property.status]}</span>
+          <h1 className={styles.title}>{propertyTitle}</h1>
+        </div>
+        <div className={styles.headerActions}>
+          <ShareButton
+            url={canonical}
+            title={propertyTitle}
+            label={copy.share}
+            copiedLabel={copy.shareCopied}
+          />
+          <FavoriteButton label={copy.favorite} />
+        </div>
+      </div>
+
+      <p className={styles.location}>{locationLabel}</p>
+      <p className={styles.updatedAt}>
         {copy.updatedAt} {new Date(property.updatedAt).toLocaleDateString(locale)}
       </p>
 
-      {property.media.length > 0 ? (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(14rem, 1fr))',
-            gap: '0.6rem',
-            marginTop: '1.25rem',
-          }}
-        >
-          {property.media.map((media, index) => (
-            <div
-              key={media.id}
-              style={{
-                position: 'relative',
-                aspectRatio: '4 / 3',
-                borderRadius: 'var(--radius)',
-                overflow: 'hidden',
-              }}
-            >
-              <Image
-                src={resolveMediaUrl(media.url)}
-                alt={`${translation?.title} — ${index + 1}`}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                style={{ objectFit: 'cover' }}
-                priority={index === 0}
-              />
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <div className={styles.gallery}>
+        <PropertyGallery media={property.media} title={propertyTitle} locale={locale} />
+      </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 2fr) minmax(16rem, 1fr)',
-          gap: '2rem',
-          marginTop: '2rem',
-        }}
-      >
+      <div className={styles.layout}>
         <div>
-          <div className="price" style={{ fontSize: '1.8rem', color: 'var(--navy-900)' }}>
-            {formatPrice(property.price, property.currency, locale)}
+          <div className={styles.priceRow}>
+            <span className={`price ${styles.price}`}>
+              {formatPrice(property.price, property.currency, locale)}
+            </span>
+            {usdEstimate ? (
+              <span className={styles.usdEstimate}>
+                ≈ {usdEstimate} · {copy.usdEstimate}
+              </span>
+            ) : null}
           </div>
-          {usdEstimate ? (
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-              ≈ {usdEstimate} · {copy.usdEstimate}
-            </div>
-          ) : null}
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(9rem, 1fr))',
-              gap: '0.9rem',
-              marginTop: '1.4rem',
-            }}
-          >
+          <div className={styles.stats}>
             <Stat label={copy.bedrooms} value={property.bedrooms} />
             <Stat label={copy.bathrooms} value={property.bathrooms} />
             <Stat label={copy.parking} value={property.parkingSpots} />
@@ -253,57 +261,62 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
             {property.yearBuilt ? <Stat label={copy.year} value={property.yearBuilt} /> : null}
           </div>
 
-          <h2 style={{ fontSize: '1.2rem', marginTop: '2rem' }}>{copy.description}</h2>
-          <p style={{ color: 'var(--text)', marginTop: '0.5rem', whiteSpace: 'pre-line' }}>
-            {translation?.fullDescription}
-          </p>
+          <h2 className={styles.sectionTitle}>{copy.description}</h2>
+          <p className={styles.description}>{translation?.fullDescription}</p>
 
           {property.features.length > 0 ? (
             <>
-              <h2 style={{ fontSize: '1.2rem', marginTop: '2rem' }}>{copy.features}</h2>
-              <div
-                style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.7rem' }}
-              >
+              <h2 className={styles.sectionTitle}>{copy.features}</h2>
+              <div className={styles.featureList}>
                 {property.features.map((feature) => (
-                  <span
-                    key={feature.id}
-                    className="badge"
-                    style={{ background: 'var(--surface-2)', color: 'var(--navy-900)' }}
-                  >
+                  <span key={feature.id} className={`badge ${styles.featureBadge}`}>
                     {feature.name}
                   </span>
                 ))}
               </div>
             </>
           ) : null}
+
+          {property.location.latitude != null && property.location.longitude != null ? (
+            <>
+              <h2 className={styles.sectionTitle}>{copy.location}</h2>
+              <PropertyLocationMap
+                latitude={property.location.latitude}
+                longitude={property.location.longitude}
+                locale={locale}
+              />
+            </>
+          ) : null}
+
+          {property.relatedProperties.length > 0 ? (
+            <section>
+              <h2 className={styles.sectionTitle}>{copy.related}</h2>
+              <div className={styles.relatedGrid}>
+                {property.relatedProperties.map((related) => (
+                  <PropertyCard key={related.id} property={related} locale={locale} />
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <div>
-          <PropertyInquirySection
+          <PropertyContactCard
             propertyId={property.id}
-            propertyTitle={translation?.title ?? slug}
+            propertyTitle={propertyTitle}
+            propertySlug={property.slug}
+            propertyUrl={canonical}
             locale={locale}
           />
         </div>
       </div>
 
-      {property.relatedProperties.length > 0 ? (
-        <section style={{ marginTop: '3rem' }}>
-          <h2 style={{ fontSize: '1.4rem' }}>{copy.related}</h2>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-              gap: '1.25rem',
-              marginTop: '1rem',
-            }}
-          >
-            {property.relatedProperties.map((related) => (
-              <PropertyCard key={related.id} property={related} locale={locale} />
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <PropertyMobileStickyBar
+        propertyTitle={propertyTitle}
+        propertySlug={property.slug}
+        propertyUrl={canonical}
+        locale={locale}
+      />
     </main>
   );
 }
@@ -311,17 +324,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
-      <div
-        style={{
-          fontSize: '0.75rem',
-          color: 'var(--text-muted)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.04em',
-        }}
-      >
-        {label}
-      </div>
-      <div style={{ fontSize: '1.05rem', fontWeight: 600 }}>{value}</div>
+      <div className={styles.statLabel}>{label}</div>
+      <div className={styles.statValue}>{value}</div>
     </div>
   );
 }

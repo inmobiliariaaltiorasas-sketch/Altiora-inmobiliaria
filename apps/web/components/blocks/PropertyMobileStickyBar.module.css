@@ -1,0 +1,30 @@
+.bar {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .bar {
+    display: flex;
+    gap: 0.6rem;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow-float);
+  }
+}
+
+.btn {
+  flex: 1;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}

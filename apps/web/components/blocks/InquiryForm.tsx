@@ -14,6 +14,8 @@ const COPY: Record<
     contactWhatsapp: string;
     contactPhone: string;
     contactEmail: string;
+    propertyType: string;
+    location: string;
     submit: string;
     sending: string;
     sent: string;
@@ -26,6 +28,8 @@ const COPY: Record<
     contactWhatsapp: 'Número de WhatsApp',
     contactPhone: 'Teléfono',
     contactEmail: 'Correo electrónico',
+    propertyType: 'Tipo de inmueble',
+    location: 'Ubicación',
     submit: 'Enviar',
     sending: 'Enviando…',
     sent: 'Listo — un asesor te va a contactar pronto.',
@@ -37,6 +41,8 @@ const COPY: Record<
     contactWhatsapp: 'WhatsApp number',
     contactPhone: 'Phone number',
     contactEmail: 'Email address',
+    propertyType: 'Property type',
+    location: 'Location',
     submit: 'Send',
     sending: 'Sending…',
     sent: 'Done — an advisor will reach out soon.',
@@ -49,13 +55,24 @@ interface InquiryFormProps {
   inquiryType: InquiryType;
   locale: SupportedLocale;
   title: string;
+  /** Agrega "Tipo de inmueble"/"Ubicación" — se envían dentro de `note` (el DTO no tiene
+   *  campos propios para esto todavía). Pensado para el formulario de "Vende tu propiedad". */
+  showPropertyContextFields?: boolean;
 }
 
 /**
- * Único backend para el formulario de la ficha de propiedad y la página de contacto general —
- * pide solo nombre + un canal de contacto (v1 correcciones secciones 7 y 13).
+ * Único backend para el formulario de la ficha de propiedad, la página de contacto general
+ * y "Vende tu propiedad" — pide solo nombre + un canal de contacto, más los dos campos
+ * opcionales de contexto cuando `showPropertyContextFields` está activo (v1 correcciones
+ * secciones 7 y 13).
  */
-export function InquiryForm({ propertyId, inquiryType, locale, title }: InquiryFormProps) {
+export function InquiryForm({
+  propertyId,
+  inquiryType,
+  locale,
+  title,
+  showPropertyContextFields,
+}: InquiryFormProps) {
   const copy = COPY[locale];
   const [channel, setChannel] = useState<PreferredChannel>('WHATSAPP');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -66,6 +83,14 @@ export function InquiryForm({ propertyId, inquiryType, locale, title }: InquiryF
 
     const form = new FormData(event.currentTarget);
     const contactValue = String(form.get('contact') ?? '');
+
+    const noteParts: string[] = [];
+    if (showPropertyContextFields) {
+      const propertyType = String(form.get('propertyType') ?? '').trim();
+      const location = String(form.get('propertyLocation') ?? '').trim();
+      if (propertyType) noteParts.push(`${copy.propertyType}: ${propertyType}`);
+      if (location) noteParts.push(`${copy.location}: ${location}`);
+    }
 
     try {
       const response = await fetch(`${API_URL}/leads/inquiries`, {
@@ -79,6 +104,7 @@ export function InquiryForm({ propertyId, inquiryType, locale, title }: InquiryF
           preferredChannel: channel,
           inquiryType,
           propertyId,
+          note: noteParts.length > 0 ? noteParts.join(' · ') : undefined,
           sessionId: getOrCreateSessionId(),
         }),
       });
@@ -138,6 +164,20 @@ export function InquiryForm({ propertyId, inquiryType, locale, title }: InquiryF
           required
         />
       </div>
+
+      {showPropertyContextFields ? (
+        <>
+          <div className="field">
+            <label htmlFor="inquiry-property-type">{copy.propertyType}</label>
+            <input id="inquiry-property-type" name="propertyType" type="text" />
+          </div>
+
+          <div className="field">
+            <label htmlFor="inquiry-property-location">{copy.location}</label>
+            <input id="inquiry-property-location" name="propertyLocation" type="text" />
+          </div>
+        </>
+      ) : null}
 
       <button type="submit" className="btn btn-gold" disabled={status === 'sending'}>
         {status === 'sending' ? copy.sending : copy.submit}

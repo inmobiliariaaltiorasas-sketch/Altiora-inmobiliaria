@@ -9,32 +9,29 @@ import { trackEvent } from '@/lib/analytics';
 const CTA_COPY: Record<
   SupportedLocale,
   {
-    learnMore: string;
+    info: string;
     whatsapp: string;
-    advisor: string;
     visit: string;
     formTitle: Record<InquiryType, string>;
   }
 > = {
   'es-CO': {
-    learnMore: 'Quiero conocer esta propiedad',
+    info: 'Solicitar información',
     whatsapp: 'Hablar por WhatsApp',
-    advisor: 'Solicitar asesor',
     visit: 'Agendar visita',
     formTitle: {
-      GENERAL_INFO: 'Quiero más información',
+      GENERAL_INFO: 'Solicitar información',
       WHATSAPP_CONTACT: 'Contacto por WhatsApp',
       ADVISOR_REQUEST: 'Que un asesor me contacte',
       VISIT_REQUEST: 'Agendar una visita',
     },
   },
   'en-US': {
-    learnMore: 'I want to know this property',
+    info: 'Request information',
     whatsapp: 'Chat on WhatsApp',
-    advisor: 'Request an advisor',
     visit: 'Schedule a visit',
     formTitle: {
-      GENERAL_INFO: 'I want more information',
+      GENERAL_INFO: 'Request information',
       WHATSAPP_CONTACT: 'Contact via WhatsApp',
       ADVISOR_REQUEST: 'Have an advisor contact me',
       VISIT_REQUEST: 'Schedule a visit',
@@ -45,10 +42,16 @@ const CTA_COPY: Record<
 export function PropertyInquirySection({
   propertyId,
   propertyTitle,
+  propertySlug,
+  propertyUrl,
   locale,
 }: {
   propertyId: string;
   propertyTitle: string;
+  /** Código público de la propiedad — se incluye en el mensaje de WhatsApp para que el asesor
+   * identifique la propiedad de inmediato sin tener que buscarla. */
+  propertySlug: string;
+  propertyUrl: string;
   locale: SupportedLocale;
 }) {
   const copy = CTA_COPY[locale];
@@ -56,8 +59,8 @@ export function PropertyInquirySection({
 
   const whatsappLink = buildWhatsAppLink(
     locale === 'es-CO'
-      ? `Hola, quiero información sobre ${propertyTitle}`
-      : `Hi, I'd like information about ${propertyTitle}`,
+      ? `Hola, estoy interesado en la propiedad "${propertyTitle}", código ${propertySlug}. Quisiera recibir más información. ${propertyUrl}`
+      : `Hi, I'm interested in the property "${propertyTitle}", code ${propertySlug}. I'd like more information. ${propertyUrl}`,
   );
 
   return (
@@ -68,7 +71,7 @@ export function PropertyInquirySection({
           className="btn btn-primary"
           onClick={() => setInquiryType('GENERAL_INFO')}
         >
-          {copy.learnMore}
+          {copy.info}
         </button>
         {whatsappLink ? (
           <a
@@ -81,13 +84,6 @@ export function PropertyInquirySection({
             {copy.whatsapp}
           </a>
         ) : null}
-        <button
-          type="button"
-          className="btn btn-outline"
-          onClick={() => setInquiryType('ADVISOR_REQUEST')}
-        >
-          {copy.advisor}
-        </button>
         <button
           type="button"
           className="btn btn-outline"
