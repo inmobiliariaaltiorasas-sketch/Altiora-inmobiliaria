@@ -1,0 +1,98 @@
+.intro {
+  max-width: 40rem;
+  padding-top: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.tagline {
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  margin-top: 0.6rem;
+}
+
+.introBody {
+  color: var(--text-muted);
+  margin-top: 1.1rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.sectionTitle {
+  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+}
+
+.steps {
+  list-style: none;
+  margin: 2.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+@media (min-width: 768px) {
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem 1.25rem;
+  }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stepNumber {
+  font-family: var(--font-plex-mono), monospace;
+  color: var(--gold-500);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+
+.stepTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.stepBody {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.valuesSection {
+  background: var(--surface);
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem 2.5rem;
+  margin-top: 2.25rem;
+}
+
+@media (min-width: 860px) {
+  .valuesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.valueItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.valueTitle {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.valueBody {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+}
