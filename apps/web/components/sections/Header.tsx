@@ -38,6 +38,7 @@ export async function Header({ locale }: { locale: SupportedLocale }) {
             alt="ALTiora Construcciones e Inmobiliaria S.A.S."
             width={777}
             height={181}
+            quality={100}
             className={styles.logoMark}
             priority
           />
