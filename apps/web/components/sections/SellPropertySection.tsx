@@ -63,6 +63,7 @@ export function SellPropertySection({ locale }: { locale: SupportedLocale }) {
             locale={locale}
             title={copy.formTitle}
             showPropertyContextFields
+            submitLabel={locale === 'es-CO' ? 'Solicitar valoración' : 'Request a valuation'}
           />
         </div>
       </div>

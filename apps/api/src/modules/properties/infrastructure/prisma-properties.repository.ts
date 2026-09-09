@@ -11,7 +11,10 @@ import {
   type PropertySummaryDto,
 } from '@altiora/shared-types';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
-import { DEMO_TITLE_MARKERS } from '../../../common/utils/demo-content';
+import {
+  excludeDemoPropertiesWhere,
+  publicPropertyWhere,
+} from '../../../common/utils/property-visibility';
 import type {
   CreatePropertyInput,
   PropertiesRepository,
@@ -19,11 +22,6 @@ import type {
   PropertySnapshot,
   UpdatePropertyInput,
 } from '../domain/properties.repository';
-
-/** Excluye propiedades cuyo título (en cualquier idioma) tenga un marcador de contenido demo. */
-const excludeDemoProperties: Prisma.PropertyWhereInput[] = DEMO_TITLE_MARKERS.map((marker) => ({
-  translations: { some: { title: { contains: marker, mode: 'insensitive' } } },
-}));
 
 const propertyInclude = {
   city: true,
@@ -42,8 +40,7 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
 
   async search(filters: PropertySearchFilters): Promise<PropertySearchResultDto> {
     const where: Prisma.PropertyWhereInput = {
-      status: filters.includeUnpublished ? undefined : 'PUBLISHED',
-      NOT: filters.includeUnpublished ? undefined : excludeDemoProperties,
+      ...(filters.includeUnpublished ? {} : publicPropertyWhere()),
       city: filters.citySlug ? { slug: filters.citySlug } : undefined,
       neighborhood: filters.neighborhoodSlug ? { slug: filters.neighborhoodSlug } : undefined,
       propertyType: filters.propertyTypeSlug ? { slug: filters.propertyTypeSlug } : undefined,
@@ -78,7 +75,7 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
 
   async findPublicBySlug(slug: string, locale: SupportedLocale): Promise<PropertyDetailDto | null> {
     const property = await this.prisma.property.findFirst({
-      where: { slug, status: 'PUBLISHED', NOT: excludeDemoProperties },
+      where: { slug, ...publicPropertyWhere() },
       include: propertyInclude,
     });
     return property
@@ -203,7 +200,7 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
 
   async listSitemapEntries(): Promise<PropertySitemapEntryDto[]> {
     const properties = await this.prisma.property.findMany({
-      where: { status: 'PUBLISHED', NOT: excludeDemoProperties },
+      where: publicPropertyWhere(),
       select: { slug: true, updatedAt: true },
     });
     return properties.map((p) => ({ slug: p.slug, updatedAt: p.updatedAt.toISOString() }));
@@ -219,7 +216,7 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
         status: 'PUBLISHED',
         cityId: property.cityId,
         propertyTypeId: property.propertyTypeId,
-        NOT: excludeDemo ? excludeDemoProperties : undefined,
+        NOT: excludeDemo ? excludeDemoPropertiesWhere : undefined,
       },
       include: propertyInclude,
       take: 4,

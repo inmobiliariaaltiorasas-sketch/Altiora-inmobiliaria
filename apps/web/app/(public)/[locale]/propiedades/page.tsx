@@ -32,10 +32,10 @@ const COPY: Record<
     emptyFiltered:
       'No encontramos propiedades con esos filtros. Probá ampliando el rango de precio o cambiando la ciudad.',
     resetFilters: 'Quitar filtros',
-    emptyCatalogTitle: 'Próximamente nuevas propiedades',
+    emptyCatalogTitle: 'Estamos preparando nuevas oportunidades',
     emptyCatalogBody:
-      'Estamos preparando nuevas oportunidades inmobiliarias en Cartago y sus alrededores. Muy pronto vas a encontrar acá propiedades seleccionadas por Altiora.',
-    emptyCatalogContactCta: 'Contactar a un asesor',
+      'Nuestro inventario se actualiza constantemente. Habla con un asesor de Altiora para conocer propiedades disponibles o próximas a publicarse.',
+    emptyCatalogContactCta: 'Hablar con un asesor',
     emptyCatalogWhatsappCta: 'Hablar por WhatsApp',
     previous: '← Anterior',
     next: 'Siguiente →',
@@ -48,9 +48,9 @@ const COPY: Record<
     emptyFiltered:
       'No properties matched those filters. Try widening the price range or changing the city.',
     resetFilters: 'Clear filters',
-    emptyCatalogTitle: 'New properties coming soon',
+    emptyCatalogTitle: "We're preparing new opportunities",
     emptyCatalogBody:
-      "We're preparing new real estate opportunities in Cartago and the surrounding area. You'll soon find properties selected by Altiora here.",
+      'Our inventory updates constantly. Talk to an Altiora advisor to learn about available properties or listings coming soon.',
     emptyCatalogContactCta: 'Talk to an advisor',
     emptyCatalogWhatsappCta: 'Chat on WhatsApp',
     previous: '← Previous',

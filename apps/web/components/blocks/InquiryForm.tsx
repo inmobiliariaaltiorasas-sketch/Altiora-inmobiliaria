@@ -33,7 +33,7 @@ const COPY: Record<
     submit: 'Enviar',
     sending: 'Enviando…',
     sent: 'Listo — un asesor te va a contactar pronto.',
-    error: 'No pudimos enviar tu solicitud. Intentá de nuevo.',
+    error: 'No pudimos enviar tu solicitud. Inténtalo de nuevo.',
   },
   'en-US': {
     name: 'Name',
@@ -58,6 +58,8 @@ interface InquiryFormProps {
   /** Agrega "Tipo de inmueble"/"Ubicación" — se envían dentro de `note` (el DTO no tiene
    *  campos propios para esto todavía). Pensado para el formulario de "Vende tu propiedad". */
   showPropertyContextFields?: boolean;
+  /** Reemplaza el texto genérico "Enviar" del botón cuando el contexto pide algo más específico. */
+  submitLabel?: string;
 }
 
 /**
@@ -72,6 +74,7 @@ export function InquiryForm({
   locale,
   title,
   showPropertyContextFields,
+  submitLabel,
 }: InquiryFormProps) {
   const copy = COPY[locale];
   const [channel, setChannel] = useState<PreferredChannel>('WHATSAPP');
@@ -180,7 +183,7 @@ export function InquiryForm({
       ) : null}
 
       <button type="submit" className="btn btn-gold" disabled={status === 'sending'}>
-        {status === 'sending' ? copy.sending : copy.submit}
+        {status === 'sending' ? copy.sending : (submitLabel ?? copy.submit)}
       </button>
 
       {status === 'error' && (

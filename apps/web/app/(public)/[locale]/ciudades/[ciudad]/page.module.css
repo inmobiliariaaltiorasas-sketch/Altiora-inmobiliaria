@@ -1,0 +1,98 @@
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding-top: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.breadcrumb a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--navy-900);
+}
+
+.intro {
+  margin-top: 0.75rem;
+}
+
+.tagline {
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  font-size: 1.02rem;
+}
+
+.neighborhoods {
+  margin-top: 1.5rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.chip {
+  background: var(--surface-2);
+  color: var(--navy-900);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.75rem;
+}
+
+.empty {
+  margin-top: 1.75rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  display: grid;
+  gap: 1.25rem;
+  justify-items: center;
+}
+
+.faqSection {
+  max-width: 42rem;
+}
+
+.faqTitle {
+  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+}
+
+.faqList {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.faqItem {
+  padding: 0.9rem 1.1rem;
+}
+
+.faqQuestion {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.faqQuestion::-webkit-details-marker {
+  display: none;
+}
+
+.faqAnswer {
+  margin-top: 0.6rem;
+  color: var(--text);
+  line-height: 1.6;
+}

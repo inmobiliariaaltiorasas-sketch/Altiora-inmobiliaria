@@ -33,3 +33,4 @@ apps/api/uploads/
 
 # misc
 .atl/
+cloudflared.exe

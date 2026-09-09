@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { DEFAULT_LOCALE, type FaqDto, type SupportedLocale } from '@altiora/shared-types';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import { publicPropertyWhere } from '../../../common/utils/property-visibility';
 import { CitiesService } from '../../cities/application/cities.service';
 
 const faqInclude = { translations: true } satisfies Prisma.FaqInclude;
@@ -80,7 +81,7 @@ export class FaqService {
   ): Promise<string> {
     const groups = await this.prisma.property.groupBy({
       by: ['currency'],
-      where: { cityId, status: 'PUBLISHED' },
+      where: { cityId, ...publicPropertyWhere() },
       _min: { price: true },
       _max: { price: true },
     });
@@ -116,7 +117,7 @@ export class FaqService {
     cityName: string,
   ): Promise<string> {
     const properties = await this.prisma.property.findMany({
-      where: { cityId, status: 'PUBLISHED', neighborhoodId: { not: null } },
+      where: { cityId, neighborhoodId: { not: null }, ...publicPropertyWhere() },
       select: { neighborhood: { select: { name: true } } },
       distinct: ['neighborhoodId'],
     });

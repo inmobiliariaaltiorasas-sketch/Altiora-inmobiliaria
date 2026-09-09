@@ -37,12 +37,12 @@ const COPY: Record<
       {
         number: '01',
         title: 'Escuchamos',
-        body: 'Entendemos qué buscás, tu presupuesto y tus tiempos antes de mostrarte cualquier propiedad.',
+        body: 'Entendemos qué buscas, tu presupuesto y tus tiempos antes de mostrarte cualquier propiedad.',
       },
       {
         number: '02',
         title: 'Seleccionamos',
-        body: 'Filtramos el inventario disponible para mostrarte solo lo que realmente se ajusta a lo que necesitás.',
+        body: 'Filtramos el inventario disponible para mostrarte solo lo que realmente se ajusta a lo que necesitas.',
       },
       {
         number: '03',
@@ -57,7 +57,7 @@ const COPY: Record<
       {
         number: '05',
         title: 'Acompañamos',
-        body: 'Seguimos con vos hasta que el proceso quede cerrado, no solo hasta la primera visita.',
+        body: 'Seguimos contigo hasta que el proceso quede cerrado, no solo hasta la primera visita.',
       },
     ],
     valuesTitle: 'Nuestros valores',

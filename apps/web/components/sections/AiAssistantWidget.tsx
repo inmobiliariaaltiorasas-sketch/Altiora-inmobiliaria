@@ -25,7 +25,7 @@ const COPY: Record<
       '¡Hola! Soy el asistente virtual de Altiora. Estoy aquí para ayudarte a encontrar tu propiedad ideal.',
     start: 'Iniciar conversación',
     started:
-      'Muy pronto vas a poder chatear en vivo con nuestro asistente. Mientras tanto, escribinos por WhatsApp.',
+      'Muy pronto vas a poder chatear en vivo con nuestro asistente. Mientras tanto, escríbenos por WhatsApp.',
     close: 'Cerrar asistente',
     open: 'Abrir asistente virtual',
   },

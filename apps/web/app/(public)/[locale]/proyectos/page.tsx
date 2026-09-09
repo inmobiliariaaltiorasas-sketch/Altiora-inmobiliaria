@@ -20,12 +20,12 @@ const COPY: Record<
   'es-CO': {
     eyebrow: 'PROYECTOS ALTIORA',
     title: 'Estamos preparando nuevos proyectos',
-    body: 'Todavía no tenemos proyectos de construcción publicados, pero ya estamos trabajando en los próximos. Si querés ser de los primeros en conocerlos, escribinos y te avisamos apenas estén disponibles.',
+    body: 'Todavía no tenemos proyectos de construcción publicados, pero ya estamos trabajando en los próximos. Si quieres ser de los primeros en conocerlos, escríbenos y te avisamos apenas estén disponibles.',
     whatsappCta: 'Avisarme por WhatsApp',
     whatsappMessage: 'Hola, quiero que me avisen cuando tengan nuevos proyectos disponibles.',
     browseCta: 'Ver propiedades disponibles →',
     metaDescription:
-      'Los proyectos de construcción de Altiora están en preparación. Dejanos tu contacto por WhatsApp para conocerlos apenas estén disponibles.',
+      'Los proyectos de construcción de Altiora están en preparación. Déjanos tu contacto por WhatsApp para conocerlos apenas estén disponibles.',
   },
   'en-US': {
     eyebrow: 'ALTIORA PROJECTS',

@@ -8,6 +8,7 @@ import { ResourcesBlock } from '@/components/sections/ResourcesBlock';
 import { WhyAltiora } from '@/components/sections/WhyAltiora';
 import { BrandBlock } from '@/components/sections/BrandBlock';
 import { SellPropertySection } from '@/components/sections/SellPropertySection';
+import { Testimonials, type Testimonial } from '@/components/sections/Testimonials';
 import { FinalCta } from '@/components/sections/FinalCta';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
@@ -15,6 +16,9 @@ import { getPropertyTypes } from '@/lib/api/catalog';
 import styles from './page.module.css';
 
 const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
+
+// Sin testimonios reales todavía — el componente se oculta solo mientras esta lista esté vacía.
+const TESTIMONIALS: Testimonial[] = [];
 
 const COPY: Record<
   SupportedLocale,
@@ -31,7 +35,7 @@ const COPY: Record<
   'es-CO': {
     title: 'ALTiora — Casas y apartamentos en Cartago, Valle del Cauca',
     description:
-      'Propiedades verificadas en Cartago con precios reales y visibles, sin registro. Busca casas, apartamentos y lotes, y habla con un asesor cuando vos decidas.',
+      'Propiedades verificadas en Cartago con precios reales y visibles, sin registro. Busca casas, apartamentos y lotes, y habla con un asesor cuando quieras.',
     featuredEyebrow: 'SELECCIÓN ALTIORA',
     featuredTitle: 'Propiedades que vale la pena descubrir',
     featuredIntro:
@@ -176,6 +180,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       <SellPropertySection locale={locale} />
+
+      {TESTIMONIALS.length > 0 ? (
+        <section className="container section">
+          <Testimonials locale={locale} testimonials={TESTIMONIALS} />
+        </section>
+      ) : null}
 
       <FinalCta locale={locale} />
     </main>

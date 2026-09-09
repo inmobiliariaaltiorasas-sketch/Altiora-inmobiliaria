@@ -125,10 +125,17 @@
 @media (max-width: 900px) {
   .hero {
     padding-bottom: 2.5rem;
+    min-height: 32rem;
   }
 
   .content {
     padding-top: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    min-height: 28rem;
   }
 }
 

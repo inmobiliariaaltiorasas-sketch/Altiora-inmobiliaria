@@ -1,9 +1,16 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { getBlogPostBySlug } from '@/lib/api/blog';
+import styles from './page.module.css';
 
 const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
+
+const COPY: Record<SupportedLocale, { breadcrumb: string; updatedOn: string; backToBlog: string }> = {
+  'es-CO': { breadcrumb: 'Blog', updatedOn: 'actualizado el', backToBlog: 'Volver al blog' },
+  'en-US': { breadcrumb: 'Blog', updatedOn: 'updated on', backToBlog: 'Back to blog' },
+};
 
 interface RouteParams {
   locale: string;
@@ -35,17 +42,22 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical },
+    openGraph: { title, description, url: canonical, siteName: 'ALTiora', type: 'article' },
   };
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<RouteParams> }) {
   const { locale, slug } = (await params) as { locale: SupportedLocale; slug: string };
+  const copy = COPY[locale];
   const post = await getBlogPostBySlug(slug, locale);
   if (!post) notFound();
 
   const translation = resolveTranslation(post, locale);
   const canonical = `${WEB_URL}/${locale}/blog/${slug}`;
+
+  const publishedAt = post.publishedAt ? new Date(post.publishedAt) : null;
+  const updatedAt = new Date(post.updatedAt);
+  const wasUpdated = publishedAt ? updatedAt.toDateString() !== publishedAt.toDateString() : false;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -71,30 +83,38 @@ export default async function BlogPostPage({ params }: { params: Promise<RoutePa
   };
 
   return (
-    <main className="container" style={{ padding: '2rem 1.5rem 3rem', maxWidth: '42rem' }}>
+    <main>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <h1 style={{ fontSize: '1.9rem' }}>{translation?.title}</h1>
-      {post.publishedAt ? (
-        <p style={{ color: 'var(--text-muted)', marginTop: '0.4rem', fontSize: '0.85rem' }}>
-          {new Date(post.publishedAt).toLocaleDateString(locale)}
-          {new Date(post.updatedAt).toDateString() !== new Date(post.publishedAt).toDateString()
-            ? ` · ${locale === 'en-US' ? 'updated on' : 'actualizado el'} ${new Date(post.updatedAt).toLocaleDateString(locale)}`
-            : ''}
-        </p>
-      ) : null}
-      <p
-        style={{
-          marginTop: '1.5rem',
-          color: 'var(--text)',
-          whiteSpace: 'pre-line',
-          lineHeight: 1.7,
-        }}
+
+      <nav
+        className={`container ${styles.breadcrumb}`}
+        aria-label={locale === 'es-CO' ? 'Ruta de navegación' : 'Breadcrumb'}
       >
-        {translation?.body}
-      </p>
+        <Link href={`/${locale}/blog`}>← {copy.breadcrumb}</Link>
+      </nav>
+
+      <article className={`container ${styles.article}`}>
+        <h1 className={styles.title}>{translation?.title}</h1>
+        {publishedAt ? (
+          <p className={styles.meta}>
+            {publishedAt.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })}
+            {wasUpdated
+              ? ` · ${copy.updatedOn} ${updatedAt.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })}`
+              : ''}
+          </p>
+        ) : null}
+
+        <div className={styles.body}>{translation?.body}</div>
+
+        <div className={styles.footer}>
+          <Link href={`/${locale}/blog`} className={styles.backLink}>
+            ← {copy.backToBlog}
+          </Link>
+        </div>
+      </article>
     </main>
   );
 }

@@ -1,0 +1,162 @@
+.intro {
+  max-width: 40rem;
+  padding-top: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.tagline {
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  margin-top: 0.6rem;
+}
+
+.lede {
+  color: var(--text-muted);
+  margin-top: 1.1rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.25rem;
+}
+
+.cityCard {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.4rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cityIcon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--navy-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.cityIcon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--gold-400);
+}
+
+.cityName {
+  font-size: 1.25rem;
+  margin-top: 1.1rem;
+}
+
+.cityDepartment {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: 0.3rem 0 0;
+}
+
+.cityMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1.1rem;
+  color: var(--navy-900);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--gold-500);
+  padding-bottom: 2px;
+  align-self: flex-start;
+}
+
+.cityCard:hover .cta {
+  color: var(--gold-500);
+}
+
+.featureCard {
+  display: flex;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  margin-top: 2.25rem;
+  padding: clamp(2.5rem, 6vw, 4rem);
+  text-decoration: none;
+  color: inherit;
+  background: var(--paper);
+}
+
+.featureIcon {
+  flex: none;
+  width: clamp(6rem, 12vw, 8rem);
+  height: clamp(6rem, 12vw, 8rem);
+  border-radius: 50%;
+  background: var(--navy-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featureIcon svg {
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--gold-400);
+}
+
+.featureBody {
+  flex: 1;
+}
+
+.featureName {
+  font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+}
+
+.featureDepartment {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin: 0.4rem 0 0;
+}
+
+.featureCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1.4rem;
+  color: var(--navy-900);
+  font-weight: 600;
+  font-size: 1rem;
+  border-bottom: 1px solid var(--gold-500);
+  padding-bottom: 2px;
+}
+
+.featureCard:hover .featureCta {
+  color: var(--gold-500);
+}
+
+@media (max-width: 640px) {
+  .featureCard {
+    flex-direction: column;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+.empty {
+  margin-top: 2rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

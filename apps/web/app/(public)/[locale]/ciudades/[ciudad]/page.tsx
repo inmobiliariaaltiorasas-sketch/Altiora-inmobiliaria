@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
@@ -5,20 +6,34 @@ import { PropertyCard } from '@/components/blocks/PropertyCard';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getCityFaqs } from '@/lib/api/content';
+import styles from './page.module.css';
+
+const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
 const COPY: Record<
   SupportedLocale,
-  { titleSuffix: string; empty: string; neighborhoods: string; faq: string }
+  {
+    breadcrumbCities: string;
+    titleSuffix: string;
+    empty: string;
+    emptyCta: string;
+    neighborhoods: string;
+    faq: string;
+  }
 > = {
   'es-CO': {
+    breadcrumbCities: 'Ciudades',
     titleSuffix: 'propiedades en venta y arriendo',
-    empty: 'Todavía no hay propiedades publicadas en esta ciudad.',
+    empty: 'Todavía no hay propiedades publicadas en esta zona.',
+    emptyCta: 'Hablar con un asesor',
     neighborhoods: 'Barrios',
     faq: 'Preguntas frecuentes',
   },
   'en-US': {
+    breadcrumbCities: 'Cities',
     titleSuffix: 'properties for sale and rent',
     empty: 'No properties are published in this city yet.',
+    emptyCta: 'Talk to an advisor',
     neighborhoods: 'Neighborhoods',
     faq: 'Frequently asked questions',
   },
@@ -40,9 +55,14 @@ export async function generateMetadata({
   if (!city) return {};
 
   const title = `${city.name} — ${COPY[locale].titleSuffix} | ALTiora`;
+  const description = `Catálogo de propiedades ALTiora en ${city.name}, ${city.department}.`;
+  const url = `${WEB_URL}/${locale}/ciudades/${ciudad}`;
+
   return {
     title,
-    description: `Catálogo de propiedades ALTiora en ${city.name}, ${city.department}.`,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, siteName: 'ALTiora', type: 'website' },
   };
 }
 
@@ -73,65 +93,73 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
       : null;
 
   return (
-    <main className="container" style={{ padding: '2.5rem 1.5rem 3rem' }}>
+    <main>
       {faqJsonLd ? (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       ) : null}
-      <h1 style={{ fontSize: '1.9rem' }}>
-        {city.name}, {city.department}
-      </h1>
-      <p style={{ color: 'var(--text-muted)', marginTop: '0.4rem' }}>{copy.titleSuffix}</p>
 
-      {city.neighborhoods.length > 0 ? (
-        <div style={{ marginTop: '1rem' }}>
-          <span className="eyebrow">{copy.neighborhoods}</span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-            {city.neighborhoods.map((n) => (
-              <span
-                key={n.id}
-                className="badge"
-                style={{ background: 'var(--surface-2)', color: 'var(--navy-900)' }}
-              >
-                {n.name}
-              </span>
+      <nav
+        className={`container ${styles.breadcrumb}`}
+        aria-label={locale === 'es-CO' ? 'Ruta de navegación' : 'Breadcrumb'}
+      >
+        <Link href={`/${locale}/ciudades`}>{copy.breadcrumbCities}</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{city.name}</span>
+      </nav>
+
+      <div className={`container ${styles.intro}`}>
+        <h1 className={styles.tagline}>
+          {city.name}, {city.department}
+        </h1>
+        <p className={styles.subtitle}>{copy.titleSuffix}</p>
+
+        {city.neighborhoods.length > 0 ? (
+          <div className={styles.neighborhoods}>
+            <span className="eyebrow">{copy.neighborhoods}</span>
+            <div className={styles.chips}>
+              {city.neighborhoods.map((n) => (
+                <span key={n.id} className={`badge ${styles.chip}`}>
+                  {n.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      <section className="container section">
+        {results.items.length === 0 ? (
+          <div className={`card ${styles.empty}`}>
+            <p>{copy.empty}</p>
+            <Link href={`/${locale}/contacto`} className="btn btn-primary">
+              {copy.emptyCta}
+            </Link>
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {results.items.map((property) => (
+              <PropertyCard key={property.id} property={property} locale={locale} />
             ))}
           </div>
-        </div>
-      ) : null}
+        )}
 
-      {results.items.length === 0 ? (
-        <p style={{ marginTop: '1.5rem' }}>{copy.empty}</p>
-      ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-            gap: '1.25rem',
-            marginTop: '1.5rem',
-          }}
-        >
-          {results.items.map((property) => (
-            <PropertyCard key={property.id} property={property} locale={locale} />
-          ))}
-        </div>
-      )}
-
-      {faqs.length > 0 ? (
-        <section style={{ marginTop: '3rem', maxWidth: '42rem' }}>
-          <h2 style={{ fontSize: '1.3rem' }}>{copy.faq}</h2>
-          <div style={{ display: 'grid', gap: '0.75rem', marginTop: '1rem' }}>
-            {faqs.map((faq) => (
-              <details key={faq.id} className="card" style={{ padding: '0.9rem 1.1rem' }}>
-                <summary style={{ cursor: 'pointer', fontWeight: 600 }}>{faq.question}</summary>
-                <p style={{ marginTop: '0.6rem', color: 'var(--text)' }}>{faq.answer}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-      ) : null}
+        {faqs.length > 0 ? (
+          <section className={styles.faqSection} style={{ marginTop: '3.5rem' }}>
+            <h2 className={styles.faqTitle}>{copy.faq}</h2>
+            <div className={styles.faqList}>
+              {faqs.map((faq) => (
+                <details key={faq.id} className={`card ${styles.faqItem}`}>
+                  <summary className={styles.faqQuestion}>{faq.question}</summary>
+                  <p className={styles.faqAnswer}>{faq.answer}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </section>
     </main>
   );
 }
