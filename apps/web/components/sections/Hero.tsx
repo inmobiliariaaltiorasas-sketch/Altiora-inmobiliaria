@@ -34,7 +34,17 @@ export function Hero({ locale }: { locale: SupportedLocale }) {
 
   return (
     <section className={styles.hero}>
-      <Image src="/hero-home.png" alt="" fill priority sizes="100vw" className={styles.photo} />
+      <Image
+        src="/hero-home.webp"
+        alt=""
+        fill
+        priority
+        fetchPriority="high"
+        sizes="100vw"
+        placeholder="blur"
+        blurDataURL="data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADQAQCdASoQAAkAA4BaJZgCdAEClVpSAAD+76h/YdHKX2rrBbQRdTBrUVrXVJ9k2AY8qbVImojD5LVx92nSFwyU5X9fFQkmlZJ+pR1RwAA="
+        className={styles.photo}
+      />
       <div className={styles.texture} aria-hidden="true" />
       <div className={styles.overlay} aria-hidden="true" />
 
