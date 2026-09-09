@@ -13,9 +13,8 @@ import { FinalCta } from '@/components/sections/FinalCta';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getPropertyTypes } from '@/lib/api/catalog';
+import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
 import styles from './page.module.css';
-
-const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
 // Sin testimonios reales todavía — el componente se oculta solo mientras esta lista esté vacía.
 const TESTIMONIALS: Testimonial[] = [];
@@ -30,28 +29,50 @@ const COPY: Record<
     featuredIntro: string;
     seeAll: string;
     trustItems: string[];
+    aboutEyebrow: string;
+    aboutTitle: string;
+    aboutBody: string;
+    aboutLinks: { label: string; href: (locale: SupportedLocale) => string }[];
   }
 > = {
   'es-CO': {
-    title: 'ALTiora — Casas y apartamentos en Cartago, Valle del Cauca',
+    title: 'Inmobiliaria en Cartago | Casas, apartamentos y lotes | Altiora',
     description:
-      'Propiedades verificadas en Cartago con precios reales y visibles, sin registro. Busca casas, apartamentos y lotes, y habla con un asesor cuando quieras.',
+      'Encuentra casas, apartamentos y lotes en Cartago, Valle del Cauca. Compra, vende o arrienda con acompañamiento inmobiliario de Altiora.',
     featuredEyebrow: 'SELECCIÓN ALTIORA',
     featuredTitle: 'Propiedades que vale la pena descubrir',
     featuredIntro:
       'Una selección de inmuebles pensados para diferentes estilos de vida e inversión.',
     seeAll: 'Ver todas las propiedades →',
     trustItems: ['Precios reales y visibles', 'Propiedades verificadas', 'Asesoría en cada paso'],
+    aboutEyebrow: 'ALTIORA EN CARTAGO',
+    aboutTitle: 'Inmobiliaria local en Cartago, Valle del Cauca',
+    aboutBody:
+      'Altiora Construcciones e Inmobiliaria S.A.S. es una inmobiliaria que ofrece servicios de compra, venta, arriendo y asesoría inmobiliaria en Cartago y el norte del Valle del Cauca. Acompañamos cada proceso con información clara sobre precios y disponibilidad.',
+    aboutLinks: [
+      { label: 'propiedades en Cartago', href: (l) => `/${l}/propiedades` },
+      { label: 'vender tu propiedad', href: (l) => `/${l}/nosotros` },
+      { label: 'conocer Cartago', href: (l) => `/${l}/ciudades/cartago-valle-del-cauca` },
+    ],
   },
   'en-US': {
-    title: 'ALTiora — Houses and apartments in Cartago, Valle del Cauca',
+    title: 'Real Estate in Cartago | Houses, Apartments and Lots | Altiora',
     description:
-      'Verified properties in Cartago with real, visible prices and no sign-up required. Search houses, apartments and lots, and talk to an advisor whenever you decide.',
+      'Find houses, apartments and lots in Cartago, Valle del Cauca. Buy, sell or rent with real estate guidance from Altiora.',
     featuredEyebrow: 'ALTIORA SELECTION',
     featuredTitle: 'Properties worth discovering',
     featuredIntro: 'A selection of properties for different lifestyles and investment goals.',
     seeAll: 'View all properties →',
     trustItems: ['Real, visible prices', 'Verified properties', 'Guidance every step'],
+    aboutEyebrow: 'ALTIORA IN CARTAGO',
+    aboutTitle: 'Local real estate agency in Cartago, Valle del Cauca',
+    aboutBody:
+      'Altiora Construcciones e Inmobiliaria S.A.S. is a real estate agency offering buying, selling, renting and real estate advisory services in Cartago and northern Valle del Cauca. We support every process with clear information about prices and availability.',
+    aboutLinks: [
+      { label: 'properties in Cartago', href: (l) => `/${l}/propiedades` },
+      { label: 'sell your property', href: (l) => `/${l}/nosotros` },
+      { label: 'explore Cartago', href: (l) => `/${l}/ciudades/cartago-valle-del-cauca` },
+    ],
   },
 };
 
@@ -62,18 +83,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
   const copy = COPY[locale];
-  const url = `${WEB_URL}/${locale}`;
+  const alternates = buildAlternates('');
 
   return {
     title: copy.title,
     description: copy.description,
-    alternates: { canonical: url },
+    alternates,
     openGraph: {
       title: copy.title,
       description: copy.description,
-      url,
+      url: alternates.languages[locale],
       siteName: 'ALTiora',
       type: 'website',
+      images: [{ url: ORGANIZATION_INFO.logo }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -143,6 +165,20 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         />
         <p className={styles.trustLine}>{copy.trustItems.join(' · ')}</p>
       </div>
+
+      <section className={`container ${styles.aboutSection}`}>
+        <span className="eyebrow">{copy.aboutEyebrow}</span>
+        <h2 className={styles.aboutTitle}>{copy.aboutTitle}</h2>
+        <p className={styles.aboutBody}>
+          {copy.aboutBody}{' '}
+          {copy.aboutLinks.map((link, index) => (
+            <span key={link.label}>
+              <Link href={link.href(locale)}>{link.label}</Link>
+              {index < copy.aboutLinks.length - 1 ? ' · ' : '.'}
+            </span>
+          ))}
+        </p>
+      </section>
 
       {results.items.length > 0 ? (
         <section className={`container section`}>

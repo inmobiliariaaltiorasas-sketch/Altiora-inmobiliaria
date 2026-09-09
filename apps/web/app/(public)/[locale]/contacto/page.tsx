@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { InquiryForm } from '@/components/blocks/InquiryForm';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { buildAlternates } from '@/lib/seo/organization';
 
 const COPY: Record<
   SupportedLocale,
@@ -29,7 +30,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
-  return { title: `${COPY[locale].title} | ALTiora` };
+  return {
+    title: `${COPY[locale].title} | ALTiora`,
+    description: COPY[locale].subtitle,
+    alternates: buildAlternates('/contacto'),
+  };
 }
 
 export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {

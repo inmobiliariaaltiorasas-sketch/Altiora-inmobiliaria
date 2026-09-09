@@ -7,6 +7,7 @@ import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getPropertyTypes } from '@/lib/api/catalog';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { buildAlternates } from '@/lib/seo/organization';
 import styles from './page.module.css';
 
 const COPY: Record<
@@ -67,7 +68,13 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
-  return { title: COPY[locale].title, description: COPY[locale].description };
+  return {
+    title: COPY[locale].title,
+    description: COPY[locale].description,
+    // Canonical siempre a la URL sin filtros: cualquier combinación de query params
+    // (precio, habitaciones, orden, página) resuelve a esta misma página canónica.
+    alternates: buildAlternates('/propiedades'),
+  };
 }
 
 export default async function PropertiesSearchPage({

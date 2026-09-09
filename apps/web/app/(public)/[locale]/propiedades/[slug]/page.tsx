@@ -13,9 +13,19 @@ import { PropertyLocationMap } from '@/components/blocks/PropertyLocationMap';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { ShareButton } from '@/components/ui/ShareButton';
 import { formatArea, formatPrice, formatUsdEstimate } from '@/lib/format';
+import { buildAlternates, ORGANIZATION_INFO, WEB_URL } from '@/lib/seo/organization';
 import styles from './page.module.css';
 
-const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
+/**
+ * Schema.org no define "RealEstateListing" como tipo estándar validable — usamos el tipo de
+ * inmueble real (House/Apartment) cuando lo conocemos, y `Residence` como base semánticamente
+ * correcta para el resto (ej. lotes), en vez de un `Product` genérico.
+ */
+function propertyJsonLdType(propertyTypeSlug: string): string {
+  if (propertyTypeSlug === 'casa') return 'House';
+  if (propertyTypeSlug === 'apartamento') return 'Apartment';
+  return 'Residence';
+}
 
 const COPY: Record<
   SupportedLocale,
@@ -118,24 +128,24 @@ export async function generateMetadata({
   const translation = resolveTranslation(property, locale);
   const title = translation?.seoTitle ?? translation?.title ?? slug;
   const description = translation?.seoDescription ?? translation?.shortDescription ?? '';
-  const canonical = translation?.seoCanonicalOverride ?? `${WEB_URL}/${locale}/propiedades/${slug}`;
-  const image = property.media[0] ? resolveMediaUrl(property.media[0].url) : undefined;
+  const canonical = translation?.seoCanonicalOverride ?? buildAlternates(`/propiedades/${slug}`).canonical;
+  const image = property.media[0] ? resolveMediaUrl(property.media[0].url) : ORGANIZATION_INFO.logo;
 
   return {
     title,
     description,
-    alternates: { canonical },
+    alternates: { canonical, languages: buildAlternates(`/propiedades/${slug}`).languages },
     openGraph: {
       title,
       description,
       url: canonical,
-      images: image ? [{ url: image }] : undefined,
+      images: [{ url: image }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: image ? [image] : undefined,
+      images: [image],
     },
   };
 }
@@ -162,10 +172,17 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'Product',
+        '@type': propertyJsonLdType(property.propertyType.slug),
         name: translation?.title,
         description: translation?.shortDescription,
         image: property.media.map((m) => m.url),
+        address: {
+          '@type': 'PostalAddress',
+          ...(property.location.addressLine ? { streetAddress: property.location.addressLine } : {}),
+          addressLocality: property.location.city.name,
+          addressRegion: property.location.city.department,
+          addressCountry: 'CO',
+        },
         offers: {
           '@type': 'Offer',
           price: property.price,

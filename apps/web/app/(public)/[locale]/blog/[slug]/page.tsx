@@ -3,9 +3,8 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { getBlogPostBySlug } from '@/lib/api/blog';
+import { buildAlternates, ORGANIZATION_ID, ORGANIZATION_INFO, WEB_URL } from '@/lib/seo/organization';
 import styles from './page.module.css';
-
-const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
 const COPY: Record<SupportedLocale, { breadcrumb: string; updatedOn: string; backToBlog: string }> = {
   'es-CO': { breadcrumb: 'Blog', updatedOn: 'actualizado el', backToBlog: 'Volver al blog' },
@@ -36,13 +35,20 @@ export async function generateMetadata({
   const translation = resolveTranslation(post, locale);
   const title = translation?.seoTitle ?? translation?.title ?? slug;
   const description = translation?.seoDescription ?? translation?.excerpt ?? '';
-  const canonical = `${WEB_URL}/${locale}/blog/${slug}`;
+  const alternates = buildAlternates(`/blog/${slug}`);
 
   return {
     title,
     description,
-    alternates: { canonical },
-    openGraph: { title, description, url: canonical, siteName: 'ALTiora', type: 'article' },
+    alternates,
+    openGraph: {
+      title,
+      description,
+      url: alternates.languages[locale],
+      siteName: 'ALTiora',
+      type: 'article',
+      images: [{ url: ORGANIZATION_INFO.logo }],
+    },
   };
 }
 
@@ -63,10 +69,12 @@ export default async function BlogPostPage({ params }: { params: Promise<RoutePa
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'Article',
+        '@type': 'BlogPosting',
         headline: translation?.title,
         description: translation?.excerpt,
-        author: { '@type': 'Organization', name: 'ALTiora Construcciones e Inmobiliaria S.A.S.' },
+        image: [ORGANIZATION_INFO.logo],
+        author: { '@id': ORGANIZATION_ID },
+        publisher: { '@id': ORGANIZATION_ID },
         datePublished: post.publishedAt,
         dateModified: post.updatedAt,
         mainEntityOfPage: canonical,

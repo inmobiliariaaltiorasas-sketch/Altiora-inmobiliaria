@@ -6,9 +6,84 @@ import { PropertyCard } from '@/components/blocks/PropertyCard';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getCityFaqs } from '@/lib/api/content';
+import { buildAlternates, ORGANIZATION_INFO, WEB_URL } from '@/lib/seo/organization';
 import styles from './page.module.css';
 
-const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
+interface StaticFaq {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+/**
+ * FAQs estáticas de intención AEO (además de precio/barrios, que son dinámicas y ya vienen de
+ * `getCityFaqs`). Viven en código, no en la tabla `Faq`, porque no dependen de datos de
+ * propiedades — son las mismas siempre. `hasInventory` decide la respuesta honesta sobre
+ * inventario disponible: nunca afirmar que hay casas si el catálogo está vacío.
+ */
+function staticCityFaqs(locale: SupportedLocale, cityName: string, hasInventory: boolean): StaticFaq[] {
+  if (locale === 'en-US') {
+    return [
+      {
+        id: 'static-inventory-type',
+        question: `What type of properties can I find in ${cityName}?`,
+        answer: hasInventory
+          ? `Altiora's catalog in ${cityName} includes houses, apartments and lots for sale or rent. You can filter by property type and price in our property search.`
+          : `We don't have published listings in ${cityName} right now. Talk to an Altiora advisor to know about upcoming houses, apartments and lots as they become available.`,
+      },
+      {
+        id: 'static-how-to-buy',
+        question: `How can I buy a property in ${cityName} with Altiora?`,
+        answer: `You browse the catalog, contact an Altiora advisor about the property you're interested in, and we guide you through the visit, price negotiation and closing process.`,
+      },
+      {
+        id: 'static-sell-help',
+        question: `Does Altiora help sell properties in ${cityName}?`,
+        answer: `Yes. Altiora supports property owners in ${cityName} who want to sell, from an initial valuation through negotiation and closing with a buyer.`,
+      },
+      {
+        id: 'static-valuation',
+        question: 'How do I request a valuation of my property?',
+        answer: `Fill out the owner form on our website with your property details, or reach out directly, and an Altiora advisor will contact you to arrange a valuation.`,
+      },
+      {
+        id: 'static-contact-advisor',
+        question: `How can I contact a real estate advisor in ${cityName}?`,
+        answer: `You can reach Altiora through the contact form or WhatsApp on our website, or by phone at +57 300 605 0811.`,
+      },
+    ];
+  }
+
+  return [
+    {
+      id: 'static-inventory-type',
+      question: `¿Qué tipo de propiedades puedo encontrar en ${cityName}?`,
+      answer: hasInventory
+        ? `El catálogo de Altiora en ${cityName} incluye casas, apartamentos y lotes en venta o arriendo. Podés filtrar por tipo de propiedad y precio en nuestro buscador.`
+        : `Todavía no tenemos propiedades publicadas en ${cityName}. Hablá con un asesor de Altiora para conocer casas, apartamentos y lotes a medida que se publiquen.`,
+    },
+    {
+      id: 'static-how-to-buy',
+      question: `¿Cómo puedo comprar una propiedad en ${cityName} con Altiora?`,
+      answer: `Explorás el catálogo, contactás a un asesor de Altiora por la propiedad que te interesa, y te acompañamos en la visita, la negociación del precio y el cierre del proceso.`,
+    },
+    {
+      id: 'static-sell-help',
+      question: `¿Altiora ayuda a vender propiedades en ${cityName}?`,
+      answer: `Sí. Altiora acompaña a propietarios en ${cityName} que quieren vender, desde la valoración inicial hasta la negociación y el cierre con un comprador.`,
+    },
+    {
+      id: 'static-valuation',
+      question: '¿Cómo solicitar una valoración de mi inmueble?',
+      answer: `Completá el formulario para propietarios en nuestro sitio con los datos de tu inmueble, o escribinos directamente, y un asesor de Altiora te va a contactar para coordinar la valoración.`,
+    },
+    {
+      id: 'static-contact-advisor',
+      question: `¿Cómo contactar a un asesor inmobiliario en ${cityName}?`,
+      answer: `Podés escribirnos por el formulario de contacto o WhatsApp en nuestro sitio, o llamar al 300 605 0811.`,
+    },
+  ];
+}
 
 const COPY: Record<
   SupportedLocale,
@@ -22,7 +97,7 @@ const COPY: Record<
   }
 > = {
   'es-CO': {
-    breadcrumbCities: 'Ciudades',
+    breadcrumbCities: 'Zonas',
     titleSuffix: 'propiedades en venta y arriendo',
     empty: 'Todavía no hay propiedades publicadas en esta zona.',
     emptyCta: 'Hablar con un asesor',
@@ -54,15 +129,28 @@ export async function generateMetadata({
   const city = cities.find((c) => c.slug === ciudad);
   if (!city) return {};
 
-  const title = `${city.name} — ${COPY[locale].titleSuffix} | ALTiora`;
-  const description = `Catálogo de propiedades ALTiora en ${city.name}, ${city.department}.`;
-  const url = `${WEB_URL}/${locale}/ciudades/${ciudad}`;
+  const title =
+    locale === 'en-US'
+      ? `Properties in ${city.name}, ${city.department} | Altiora`
+      : `Propiedades en ${city.name}, ${city.department} | Altiora`;
+  const description =
+    locale === 'en-US'
+      ? `Explore real estate opportunities in ${city.name}, ${city.department}. Houses, apartments, lots and real estate guidance with Altiora.`
+      : `Explora propiedades y oportunidades inmobiliarias en ${city.name}, ${city.department}. Casas, apartamentos, lotes y asesoría inmobiliaria con Altiora.`;
+  const alternates = buildAlternates(`/ciudades/${ciudad}`);
 
   return {
     title,
     description,
-    alternates: { canonical: url },
-    openGraph: { title, description, url, siteName: 'ALTiora', type: 'website' },
+    alternates,
+    openGraph: {
+      title,
+      description,
+      url: alternates.languages[locale],
+      siteName: 'ALTiora',
+      type: 'website',
+      images: [{ url: ORGANIZATION_INFO.logo }],
+    },
   };
 }
 
@@ -74,11 +162,15 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
   const city = cities.find((c) => c.slug === ciudad);
   if (!city) notFound();
 
-  const [results, faqs] = await Promise.all([
+  const [results, dynamicFaqs] = await Promise.all([
     searchProperties({ locale, city: ciudad, pageSize: 24 }),
     getCityFaqs(ciudad, locale),
   ]);
 
+  const staticFaqs = staticCityFaqs(locale, city.name, results.items.length > 0);
+  const faqs = [...dynamicFaqs, ...staticFaqs];
+
+  const cityUrl = `${WEB_URL}/${locale}/ciudades/${ciudad}`;
   const faqJsonLd =
     faqs.length > 0
       ? {
@@ -92,6 +184,21 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
         }
       : null;
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Altiora', item: `${WEB_URL}/${locale}` },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: copy.breadcrumbCities,
+        item: `${WEB_URL}/${locale}/ciudades`,
+      },
+      { '@type': 'ListItem', position: 3, name: city.name, item: cityUrl },
+    ],
+  };
+
   return (
     <main>
       {faqJsonLd ? (
@@ -100,6 +207,10 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       ) : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
 
       <nav
         className={`container ${styles.breadcrumb}`}

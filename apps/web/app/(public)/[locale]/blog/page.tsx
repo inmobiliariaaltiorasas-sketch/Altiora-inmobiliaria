@@ -3,9 +3,8 @@ import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { listPublicBlogPosts } from '@/lib/api/blog';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
 import styles from './page.module.css';
-
-const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
 const COPY: Record<
   SupportedLocale,
@@ -52,18 +51,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
   const copy = COPY[locale];
-  const url = `${WEB_URL}/${locale}/blog`;
+  const alternates = buildAlternates('/blog');
 
   return {
     title: `${copy.title} | ALTiora`,
     description: copy.lede,
-    alternates: { canonical: url },
+    alternates,
     openGraph: {
       title: `${copy.title} | ALTiora`,
       description: copy.lede,
-      url,
+      url: alternates.languages[locale],
       siteName: 'ALTiora',
       type: 'website',
+      images: [{ url: ORGANIZATION_INFO.logo }],
     },
   };
 }

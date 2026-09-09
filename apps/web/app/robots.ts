@@ -1,10 +1,9 @@
 import type { MetadataRoute } from 'next';
-
-const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
+import { WEB_URL } from '@/lib/seo/organization';
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: '*', allow: '/', disallow: '/admin' },
+    rules: { userAgent: '*', allow: '/', disallow: ['/admin', '/api/'] },
     sitemap: `${WEB_URL}/sitemap.xml`,
   };
 }

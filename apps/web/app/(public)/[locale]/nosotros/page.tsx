@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { FinalCta } from '@/components/sections/FinalCta';
+import { buildAlternates } from '@/lib/seo/organization';
 import styles from './page.module.css';
 
 interface Step {
@@ -25,6 +26,8 @@ const COPY: Record<
     valuesTitle: string;
     values: Value[];
     metaDescription: string;
+    inCartagoTitle: string;
+    inCartagoBody: string;
   }
 > = {
   'es-CO': {
@@ -81,6 +84,9 @@ const COPY: Record<
     ],
     metaDescription:
       'Conocé cómo trabaja Altiora Construcciones e Inmobiliaria: acompañamiento real en la compra, venta y arriendo de propiedades en Cartago y el norte del Valle.',
+    inCartagoTitle: 'Altiora en Cartago',
+    inCartagoBody:
+      'Altiora Construcciones e Inmobiliaria S.A.S. opera en Cartago y el norte del Valle del Cauca, ofreciendo servicios de compra, venta, arriendo y valoración/asesoría inmobiliaria. Trabajamos con inventario verificado y acompañamos a compradores, arrendatarios y propietarios en cada etapa del proceso.',
   },
   'en-US': {
     eyebrow: 'ALTIORA REAL ESTATE',
@@ -136,6 +142,9 @@ const COPY: Record<
     ],
     metaDescription:
       "Learn how Altiora Construcciones e Inmobiliaria works: real guidance for buying, selling and renting properties in Cartago and northern Valle del Cauca.",
+    inCartagoTitle: 'Altiora in Cartago',
+    inCartagoBody:
+      'Altiora Construcciones e Inmobiliaria S.A.S. operates in Cartago and northern Valle del Cauca, offering buying, selling, renting and valuation/real estate advisory services. We work with a verified inventory and support buyers, tenants and property owners at every stage of the process.',
   },
 };
 
@@ -149,6 +158,7 @@ export async function generateMetadata({
   return {
     title: `${locale === 'es-CO' ? 'Nosotros' : 'About us'} | ALTiora`,
     description: copy.metaDescription,
+    alternates: buildAlternates('/nosotros'),
   };
 }
 
@@ -187,6 +197,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </div>
           ))}
         </div>
+      </section>
+
+      <section className={`container section ${styles.valuesSection}`}>
+        <h2 className={styles.sectionTitle}>{copy.inCartagoTitle}</h2>
+        <p className={styles.introBody}>{copy.inCartagoBody}</p>
       </section>
 
       <FinalCta locale={locale} />
