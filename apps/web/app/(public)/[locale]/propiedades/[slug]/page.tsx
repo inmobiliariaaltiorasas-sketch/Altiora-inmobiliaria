@@ -13,7 +13,9 @@ import { PropertyLocationMap } from '@/components/blocks/PropertyLocationMap';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { ShareButton } from '@/components/ui/ShareButton';
 import { formatArea, formatPrice, formatUsdEstimate } from '@/lib/format';
-import { buildAlternates, ORGANIZATION_INFO, WEB_URL } from '@/lib/seo/organization';
+import { resolveDetailAlternates } from '@/lib/seo/alternates';
+import { ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { SITE_URL } from '@/lib/seo/site-url';
 import styles from './page.module.css';
 
 /**
@@ -128,13 +130,21 @@ export async function generateMetadata({
   const translation = resolveTranslation(property, locale);
   const title = translation?.seoTitle ?? translation?.title ?? slug;
   const description = translation?.seoDescription ?? translation?.shortDescription ?? '';
-  const canonical = translation?.seoCanonicalOverride ?? buildAlternates(`/propiedades/${slug}`).canonical;
+  const { canonical, languages } = resolveDetailAlternates({
+    baseUrl: SITE_URL,
+    locale,
+    path: `/propiedades/${slug}`,
+    availableLocales: property.translations.map((t) => t.locale),
+    // Only an override written for the requested locale applies; a fallback translation's does not.
+    canonicalOverride:
+      translation?.locale === locale ? translation.seoCanonicalOverride : undefined,
+  });
   const image = property.media[0] ? resolveMediaUrl(property.media[0].url) : ORGANIZATION_INFO.logo;
 
   return {
     title,
     description,
-    alternates: { canonical, languages: buildAlternates(`/propiedades/${slug}`).languages },
+    alternates: { canonical, languages },
     openGraph: {
       title,
       description,
@@ -162,7 +172,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
   const usdEstimate =
     locale === 'en-US' ? formatUsdEstimate(property.price, property.currency, fxRate) : null;
   const translation = resolveTranslation(property, locale);
-  const canonical = `${WEB_URL}/${locale}/propiedades/${slug}`;
+  const canonical = `${SITE_URL}/${locale}/propiedades/${slug}`;
   const propertyTitle = translation?.title ?? slug;
   const locationLabel = property.location.neighborhood
     ? `${property.location.neighborhood.name}, ${property.location.city.name}`
@@ -178,7 +188,9 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
         image: property.media.map((m) => m.url),
         address: {
           '@type': 'PostalAddress',
-          ...(property.location.addressLine ? { streetAddress: property.location.addressLine } : {}),
+          ...(property.location.addressLine
+            ? { streetAddress: property.location.addressLine }
+            : {}),
           addressLocality: property.location.city.name,
           addressRegion: property.location.city.department,
           addressCountry: 'CO',
@@ -197,12 +209,12 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'ALTiora', item: `${WEB_URL}/${locale}` },
+          { '@type': 'ListItem', position: 1, name: 'ALTiora', item: `${SITE_URL}/${locale}` },
           {
             '@type': 'ListItem',
             position: 2,
             name: copy.breadcrumbProperties,
-            item: `${WEB_URL}/${locale}/propiedades`,
+            item: `${SITE_URL}/${locale}/propiedades`,
           },
           { '@type': 'ListItem', position: 3, name: translation?.title, item: canonical },
         ],

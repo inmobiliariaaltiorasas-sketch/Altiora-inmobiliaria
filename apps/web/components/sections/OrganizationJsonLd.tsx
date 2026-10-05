@@ -1,4 +1,5 @@
-import { ORGANIZATION_ID, ORGANIZATION_INFO, WEB_URL } from '@/lib/seo/organization';
+import { ORGANIZATION_ID, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { SITE_URL } from '@/lib/seo/site-url';
 
 /**
  * Un único bloque `RealEstateAgent` por página pública, en vez de repetirlo en cada ficha/post
@@ -13,7 +14,7 @@ export function OrganizationJsonLd() {
     '@id': ORGANIZATION_ID,
     name: ORGANIZATION_INFO.name,
     legalName: ORGANIZATION_INFO.legalName,
-    url: WEB_URL,
+    url: SITE_URL,
     logo: ORGANIZATION_INFO.logo,
     telephone: ORGANIZATION_INFO.telephone,
     email: ORGANIZATION_INFO.email,

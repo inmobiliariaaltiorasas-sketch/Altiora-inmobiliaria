@@ -73,7 +73,7 @@ export async function generateMetadata({
     description: COPY[locale].description,
     // Canonical siempre a la URL sin filtros: cualquier combinación de query params
     // (precio, habitaciones, orden, página) resuelve a esta misma página canónica.
-    alternates: buildAlternates('/propiedades'),
+    alternates: buildAlternates(locale, '/propiedades'),
   };
 }
 

@@ -82,7 +82,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
   const copy = COPY[locale];
-  const alternates = buildAlternates('');
+  const alternates = buildAlternates(locale, '');
 
   return {
     title: copy.title,

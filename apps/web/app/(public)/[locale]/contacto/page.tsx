@@ -33,7 +33,7 @@ export async function generateMetadata({
   return {
     title: `${COPY[locale].title} | ALTiora`,
     description: COPY[locale].subtitle,
-    alternates: buildAlternates('/contacto'),
+    alternates: buildAlternates(locale, '/contacto'),
   };
 }
 

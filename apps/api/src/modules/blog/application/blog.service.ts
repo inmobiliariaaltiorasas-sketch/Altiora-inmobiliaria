@@ -9,6 +9,7 @@ import {
 } from '@altiora/shared-types';
 import { slugify } from '../../../common/utils/slugify';
 import { DEMO_TITLE_MARKERS, hasDemoMarker } from '../../../common/utils/demo-content';
+import { toSitemapEntry } from '../../../common/utils/sitemap-entry';
 import { WebRevalidationService } from '../../../common/services/web-revalidation.service';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { AuditLogsService } from '../../audit-logs/application/audit-logs.service';
@@ -144,9 +145,9 @@ export class BlogService {
   async listSitemapEntries(): Promise<BlogSitemapEntryDto[]> {
     const posts = await this.prisma.blogPost.findMany({
       where: { status: 'PUBLISHED', NOT: excludeDemoBlogPosts },
-      select: { slug: true, updatedAt: true },
+      select: { slug: true, updatedAt: true, translations: { select: { locale: true } } },
     });
-    return posts.map((post) => ({ slug: post.slug, updatedAt: post.updatedAt.toISOString() }));
+    return posts.map(toSitemapEntry);
   }
 
   private async generateUniqueSlug(title: string): Promise<string> {

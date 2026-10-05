@@ -1,5 +1,6 @@
 import type { SupportedLocale } from '@altiora/shared-types';
-import { ORGANIZATION_ID, WEBSITE_ID, WEB_URL } from '@/lib/seo/organization';
+import { ORGANIZATION_ID, WEBSITE_ID } from '@/lib/seo/organization';
+import { SITE_URL } from '@/lib/seo/site-url';
 
 /**
  * `SearchAction` no se agrega: `/[locale]/propiedades?...` no es una ruta de búsqueda genérica
@@ -13,7 +14,7 @@ export function WebsiteJsonLd({ locale }: { locale: SupportedLocale }) {
     '@type': 'WebSite',
     '@id': WEBSITE_ID,
     name: 'Altiora',
-    url: WEB_URL,
+    url: SITE_URL,
     inLanguage: locale,
     publisher: { '@id': ORGANIZATION_ID },
   };

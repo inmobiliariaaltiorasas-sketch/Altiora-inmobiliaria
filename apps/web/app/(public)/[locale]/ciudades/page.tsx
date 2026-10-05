@@ -35,7 +35,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
   const copy = COPY[locale];
-  const alternates = buildAlternates('/ciudades');
+  const alternates = buildAlternates(locale, '/ciudades');
 
   return {
     title: `${copy.title} | ALTiora`,

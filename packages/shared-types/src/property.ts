@@ -111,6 +111,8 @@ export interface PropertySearchResultDto {
 export interface PropertySitemapEntryDto {
   slug: string;
   updatedAt: string;
+  /** Locales that have a translation row; only these URLs are real (no fallback content). */
+  locales: SupportedLocale[];
 }
 
 export interface UpsertPropertyTranslationDto {

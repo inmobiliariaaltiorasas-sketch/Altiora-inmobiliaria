@@ -52,4 +52,6 @@ export type UpdateBlogPostDto = Partial<Omit<CreateBlogPostDto, 'translations'>>
 export interface BlogSitemapEntryDto {
   slug: string;
   updatedAt: string;
+  /** Locales that have a translation row; only these URLs are real (no fallback content). */
+  locales: SupportedLocale[];
 }

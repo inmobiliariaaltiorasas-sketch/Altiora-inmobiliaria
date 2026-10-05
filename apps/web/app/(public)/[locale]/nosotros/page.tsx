@@ -158,7 +158,7 @@ export async function generateMetadata({
   return {
     title: `${locale === 'es-CO' ? 'Nosotros' : 'About us'} | ALTiora`,
     description: copy.metaDescription,
-    alternates: buildAlternates('/nosotros'),
+    alternates: buildAlternates(locale, '/nosotros'),
   };
 }
 

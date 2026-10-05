@@ -6,7 +6,8 @@ import { PropertyCard } from '@/components/blocks/PropertyCard';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getCityFaqs } from '@/lib/api/content';
-import { buildAlternates, ORGANIZATION_INFO, WEB_URL } from '@/lib/seo/organization';
+import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { SITE_URL } from '@/lib/seo/site-url';
 import styles from './page.module.css';
 
 interface StaticFaq {
@@ -21,7 +22,11 @@ interface StaticFaq {
  * propiedades — son las mismas siempre. `hasInventory` decide la respuesta honesta sobre
  * inventario disponible: nunca afirmar que hay casas si el catálogo está vacío.
  */
-function staticCityFaqs(locale: SupportedLocale, cityName: string, hasInventory: boolean): StaticFaq[] {
+function staticCityFaqs(
+  locale: SupportedLocale,
+  cityName: string,
+  hasInventory: boolean,
+): StaticFaq[] {
   if (locale === 'en-US') {
     return [
       {
@@ -137,7 +142,7 @@ export async function generateMetadata({
     locale === 'en-US'
       ? `Explore real estate opportunities in ${city.name}, ${city.department}. Houses, apartments, lots and real estate guidance with Altiora.`
       : `Explora propiedades y oportunidades inmobiliarias en ${city.name}, ${city.department}. Casas, apartamentos, lotes y asesoría inmobiliaria con Altiora.`;
-  const alternates = buildAlternates(`/ciudades/${ciudad}`);
+  const alternates = buildAlternates(locale, `/ciudades/${ciudad}`);
 
   return {
     title,
@@ -170,7 +175,7 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
   const staticFaqs = staticCityFaqs(locale, city.name, results.items.length > 0);
   const faqs = [...dynamicFaqs, ...staticFaqs];
 
-  const cityUrl = `${WEB_URL}/${locale}/ciudades/${ciudad}`;
+  const cityUrl = `${SITE_URL}/${locale}/ciudades/${ciudad}`;
   const faqJsonLd =
     faqs.length > 0
       ? {
@@ -188,12 +193,12 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Altiora', item: `${WEB_URL}/${locale}` },
+      { '@type': 'ListItem', position: 1, name: 'Altiora', item: `${SITE_URL}/${locale}` },
       {
         '@type': 'ListItem',
         position: 2,
         name: copy.breadcrumbCities,
-        item: `${WEB_URL}/${locale}/ciudades`,
+        item: `${SITE_URL}/${locale}/ciudades`,
       },
       { '@type': 'ListItem', position: 3, name: city.name, item: cityUrl },
     ],
