@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   devIndicators: false,
   transpilePackages: ['@altiora/shared-types'],
+  experimental: {
+    serverActions: {
+      // El default de 1 MB rechaza cualquier foto de celular. El admin sube de a un archivo por
+      // request (ver PropertyMediaUploadForm, tope de 15 MB por archivo) — esto deja margen para
+      // el overhead del multipart sin habilitar bodies enormes en el Worker.
+      bodySizeLimit: '20mb',
+    },
+  },
   images: {
     // Techo en 1920: el catálogo no tiene fotos más anchas que eso y evita que Next
     // interpole el Hero (fuente nativa de 1672px) hasta el default de 3840px.

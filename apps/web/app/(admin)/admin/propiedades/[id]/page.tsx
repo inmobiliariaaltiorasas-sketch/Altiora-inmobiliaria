@@ -8,6 +8,7 @@ import { getPropertyTypes } from '@/lib/api/catalog';
 import { resolveMediaUrl } from '@/lib/api-client';
 import { formatPrice } from '@/lib/format';
 import { ConfirmSubmitButton, SubmitButton } from '@/components/ui/SubmitButton';
+import { PropertyMediaUploadForm } from '@/components/blocks/PropertyMediaUploadForm';
 import {
   addPropertyMediaAction,
   archivePropertyAction,
@@ -116,7 +117,12 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
         </p>
         <form
           action={updateInfo}
-          style={{ display: 'grid', gap: '1rem', marginTop: '1rem', maxWidth: '38rem' }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr)',
+            gap: '1rem',
+            marginTop: '1rem',
+          }}
         >
           <div className="field">
             <label htmlFor="info-title">Título</label>
@@ -135,7 +141,7 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
               name="shortDescription_es"
               required
               minLength={10}
-              rows={2}
+              rows={3}
               defaultValue={translationEs?.shortDescription}
             />
           </div>
@@ -146,7 +152,7 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
               name="fullDescription_es"
               required
               minLength={20}
-              rows={5}
+              rows={14}
               defaultValue={translationEs?.fullDescription}
             />
           </div>
@@ -159,7 +165,7 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
           gap: '1.25rem',
           marginTop: '1.25rem',
         }}
@@ -187,14 +193,19 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
             action={updateStructural}
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
               gap: '0.75rem',
               marginTop: '0.75rem',
             }}
           >
             <div className="field" style={{ gridColumn: '1 / -1' }}>
               <label htmlFor="struct-city">Ciudad</label>
-              <select id="struct-city" name="cityId" defaultValue={property.location.city.id} required>
+              <select
+                id="struct-city"
+                name="cityId"
+                defaultValue={property.location.city.id}
+                required
+              >
                 {cities.map((city) => (
                   <option key={city.id} value={city.id}>
                     {city.name}
@@ -354,28 +365,7 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
         </div>
 
         {remainingPhotos > 0 ? (
-          <form
-            action={addMedia}
-            encType="multipart/form-data"
-            style={{ display: 'flex', gap: '0.6rem', marginTop: '1.25rem', alignItems: 'flex-end' }}
-          >
-            <div className="field">
-              <label htmlFor="media-type">Tipo</label>
-              <select id="media-type" name="type" defaultValue="PHOTO">
-                <option value="PHOTO">Foto</option>
-                <option value="VIDEO">Video</option>
-                <option value="TOUR">Tour virtual</option>
-                <option value="FLOORPLAN">Plano</option>
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="media-file">Archivos (hasta {remainingPhotos} más)</label>
-              <input id="media-file" name="file" type="file" multiple required />
-            </div>
-            <SubmitButton className="btn btn-primary" pendingLabel="Subiendo…">
-              Subir
-            </SubmitButton>
-          </form>
+          <PropertyMediaUploadForm action={addMedia} remaining={remainingPhotos} />
         ) : (
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '1.25rem' }}>
             Llegaste al máximo de {MAX_PHOTOS} fotos. Eliminá alguna para subir otra.
@@ -393,8 +383,8 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
       >
         <h2 style={{ fontSize: '1.1rem', color: '#b3261e' }}>Eliminar propiedad</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.2rem' }}>
-          Borra la propiedad, su historial y sus fotos para siempre. No se puede deshacer — si
-          solo querés quitarla de la web, usá &quot;Archivar&quot; en su lugar.
+          Borra la propiedad, su historial y sus fotos para siempre. No se puede deshacer — si solo
+          querés quitarla de la web, usá &quot;Archivar&quot; en su lugar.
         </p>
         <form action={deleteProperty} style={{ marginTop: '0.85rem' }}>
           <ConfirmSubmitButton
