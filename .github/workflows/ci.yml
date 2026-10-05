@@ -30,4 +30,8 @@ jobs:
       - run: npm run typecheck --workspace=apps/web
       - run: npm test --workspace=apps/api
       - run: npm test --workspace=apps/web
+      # The web build prerenders the sitemap, which reads the public API. Both values are public.
       - run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://altiora-api.onrender.com
+          NEXT_PUBLIC_WEB_URL: https://altioraimobiliaria.online
