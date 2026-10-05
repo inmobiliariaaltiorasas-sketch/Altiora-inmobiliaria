@@ -65,14 +65,27 @@
   flex: 1;
 }
 
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin-top: auto;
+  padding-top: 0.9rem;
+}
+
 .price {
   font-size: 1.32rem;
   color: var(--gold-500);
-  margin-top: 0.9rem;
 }
 
 .title {
   font-size: 1.02rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .titleLink {
@@ -123,7 +136,31 @@
 }
 
 .cta {
-  margin-top: 1rem;
   justify-content: center;
-  width: 100%;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+/* Variante de la Home: foto más baja y menos aire para que la primera fila de propiedades
+   se vea completa sin scroll. */
+.cardCompact .media {
+  aspect-ratio: 2 / 1;
+}
+
+.cardCompact .body {
+  padding: 0.75rem 1rem 0.9rem;
+}
+
+.cardCompact .stats {
+  margin-top: 0.5rem;
+}
+
+.cardCompact .footer {
+  padding-top: 0.6rem;
+}
+
+/* A un tercio del ancho, precio y botón no entran en la misma fila con el tamaño normal. */
+.cardCompact .price {
+  font-size: 1.12rem;
 }

@@ -21,10 +21,13 @@ export function PropertyCard({
   property,
   locale,
   featured = false,
+  compact = false,
 }: {
   property: PropertySummaryDto;
   locale: SupportedLocale;
   featured?: boolean;
+  /** Foto más baja y menos aire interno: la Home la usa para que la fila entre en la primera pantalla. */
+  compact?: boolean;
 }) {
   const copy = COPY[locale];
   const location = property.location.neighborhood
@@ -44,7 +47,7 @@ export function PropertyCard({
   }
 
   return (
-    <article className={`card ${styles.card}`}>
+    <article className={`card ${styles.card} ${compact ? styles.cardCompact : ''}`}>
       <Link href={`/${locale}/propiedades/${property.slug}`} className={styles.mediaLink}>
         <div className={styles.media}>
           {property.coverImageUrl ? (
@@ -52,7 +55,7 @@ export function PropertyCard({
               src={resolveMediaUrl(property.coverImageUrl)}
               alt={property.translation.title}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
             />
           ) : (
@@ -91,16 +94,18 @@ export function PropertyCard({
           </ul>
         ) : null}
 
-        <div className={`price ${styles.price}`}>
-          {formatPrice(property.price, property.currency, locale)}
-        </div>
+        <div className={styles.footer}>
+          <div className={`price ${styles.price}`}>
+            {formatPrice(property.price, property.currency, locale)}
+          </div>
 
-        <Link
-          href={`/${locale}/propiedades/${property.slug}`}
-          className={`btn btn-outline ${styles.cta}`}
-        >
-          {copy.details}
-        </Link>
+          <Link
+            href={`/${locale}/propiedades/${property.slug}`}
+            className={`btn btn-outline ${styles.cta}`}
+          >
+            {copy.details}
+          </Link>
+        </div>
       </div>
     </article>
   );

@@ -1,10 +1,10 @@
 .searchOverlap {
   position: relative;
-  margin-top: -4.5rem;
+  margin-top: -2.75rem;
 }
 
 .trustLine {
-  margin: 1.1rem 0 0;
+  margin: 0 auto;
   text-align: center;
   color: var(--text-muted);
   font-size: 0.8rem;
@@ -28,26 +28,36 @@
   line-height: 1.6;
 }
 
+/* Va pegada al buscador (antes del bloque "sobre ALTiora"): menos aire arriba que una
+   `.section` normal para que las propiedades asomen en la primera pantalla. */
+.featuredSection {
+  padding: 1.25rem 1.5rem 2.5rem;
+}
+
+@media (max-width: 720px) {
+  .featuredSection {
+    padding: 1.25rem 1.25rem 2rem;
+  }
+}
+
 .featuredHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .featuredTitle {
-  margin-top: 0.6rem;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  max-width: 32rem;
+  margin-top: 0.25rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
 }
 
 .featuredIntro {
-  margin-top: 0.6rem;
+  margin-top: 0.25rem;
   color: var(--text-muted);
-  max-width: 34rem;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .seeAllLink {
@@ -56,8 +66,20 @@
 
 .propertyGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .propertyGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .propertyGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .brandSection {
@@ -72,7 +94,7 @@
 
 @media (max-width: 720px) {
   .searchOverlap {
-    margin-top: 1.5rem;
+    margin-top: -1.5rem;
   }
 
   .brandSection {

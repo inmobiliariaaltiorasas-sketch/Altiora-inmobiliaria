@@ -14,6 +14,7 @@ const COPY: Record<
     minPrice: string;
     maxPrice: string;
     priceRange: string;
+    priceSummary: string;
     bedrooms: string;
     moreFilters: string;
     submit: string;
@@ -29,6 +30,7 @@ const COPY: Record<
     minPrice: 'Precio mínimo',
     maxPrice: 'Precio máximo',
     priceRange: 'Rango de precio',
+    priceSummary: 'Mínimo – máximo',
     bedrooms: 'Habitaciones',
     moreFilters: 'Más filtros',
     submit: 'Buscar',
@@ -43,6 +45,7 @@ const COPY: Record<
     minPrice: 'Min. price',
     maxPrice: 'Max. price',
     priceRange: 'Price range',
+    priceSummary: 'Min – max',
     bedrooms: 'Bedrooms',
     moreFilters: 'More filters',
     submit: 'Search',
@@ -67,7 +70,7 @@ export function PropertySearchForm({
   cities: CityDto[];
   propertyTypes: PropertyTypeDto[];
   defaults?: Record<string, string>;
-  /** `hero` = tabs Comprar/Arrendar + pills, calcado de la referencia visual de la Home. */
+  /** `hero` = barra horizontal compacta de la Home; operación y habitaciones van en "Más filtros". */
   variant?: 'default' | 'hero';
   quickSearches?: QuickSearchLink[];
 }) {
@@ -136,55 +139,59 @@ export function PropertySearchForm({
       >
         {isHero ? (
           <>
-            <div
-              className={styles.tabs}
-              role="radiogroup"
-              aria-label={`${copy.sale} / ${copy.rent}`}
-            >
-              <label className={styles.tab}>
-                <input
-                  type="radio"
-                  name="operation"
-                  value="SALE"
-                  defaultChecked={(d.operation ?? 'SALE') === 'SALE'}
-                  className={styles.tabInput}
-                />
-                <span className={styles.tabLabel}>{copy.sale}</span>
-              </label>
-              <label className={styles.tab}>
-                <input
-                  type="radio"
-                  name="operation"
-                  value="RENT"
-                  defaultChecked={d.operation === 'RENT'}
-                  className={styles.tabInput}
-                />
-                <span className={styles.tabLabel}>{copy.rent}</span>
-              </label>
-            </div>
-
             {cityField}
             {typeField}
 
-            <details className={styles.priceRange}>
-              <summary className={styles.priceSummary}>{copy.priceRange}</summary>
-              <div className={styles.pricePopover}>
-                <label className={styles.popoverField}>
-                  <span>{copy.minPrice}</span>
-                  <input type="number" name="minPrice" min={0} defaultValue={d.minPrice ?? ''} />
-                </label>
-                <label className={styles.popoverField}>
-                  <span>{copy.maxPrice}</span>
-                  <input type="number" name="maxPrice" min={0} defaultValue={d.maxPrice ?? ''} />
-                </label>
-              </div>
-            </details>
+            <div className={`field ${styles.field}`}>
+              <span>{copy.priceRange}</span>
+              <details className={styles.priceRange}>
+                <summary className={styles.priceSummary}>{copy.priceSummary}</summary>
+                <div className={styles.pricePopover}>
+                  <label className={styles.popoverField}>
+                    <span>{copy.minPrice}</span>
+                    <input type="number" name="minPrice" min={0} defaultValue={d.minPrice ?? ''} />
+                  </label>
+                  <label className={styles.popoverField}>
+                    <span>{copy.maxPrice}</span>
+                    <input type="number" name="maxPrice" min={0} defaultValue={d.maxPrice ?? ''} />
+                  </label>
+                </div>
+              </details>
+            </div>
 
             {submitButton}
 
             <details className={styles.moreFilters}>
               <summary>{copy.moreFilters}</summary>
-              {bedroomsField}
+              <div className={styles.morePopover}>
+                <div
+                  className={styles.tabs}
+                  role="radiogroup"
+                  aria-label={`${copy.sale} / ${copy.rent}`}
+                >
+                  <label className={styles.tab}>
+                    <input
+                      type="radio"
+                      name="operation"
+                      value="SALE"
+                      defaultChecked={(d.operation ?? 'SALE') === 'SALE'}
+                      className={styles.tabInput}
+                    />
+                    <span className={styles.tabLabel}>{copy.sale}</span>
+                  </label>
+                  <label className={styles.tab}>
+                    <input
+                      type="radio"
+                      name="operation"
+                      value="RENT"
+                      defaultChecked={d.operation === 'RENT'}
+                      className={styles.tabInput}
+                    />
+                    <span className={styles.tabLabel}>{copy.rent}</span>
+                  </label>
+                </div>
+                {bedroomsField}
+              </div>
             </details>
 
             {quickSearches && quickSearches.length > 0 ? (

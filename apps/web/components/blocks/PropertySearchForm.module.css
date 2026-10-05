@@ -10,10 +10,14 @@
   z-index: 5;
 }
 
+/* Barra de una sola fila: ubicación, tipo, precio, buscar y "Más filtros". `overflow: visible`
+   porque `.card` recorta por defecto y los popovers de precio/filtros se abren hacia abajo. */
 .formHero {
-  padding: 1.75rem 2.75rem 1.5rem;
-  grid-template-columns: repeat(4, 1fr);
+  padding: 0.7rem 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto auto;
+  gap: 0.9rem;
   align-items: end;
+  overflow: visible;
   border: 1px solid rgba(23, 32, 51, 0.05);
   box-shadow: var(--shadow-soft);
   border-radius: var(--radius-lg);
@@ -25,10 +29,8 @@
 }
 
 .tabs {
-  grid-column: 1 / -1;
   display: flex;
   gap: 0.4rem;
-  margin-bottom: 0.35rem;
 }
 
 .tab {
@@ -75,6 +77,10 @@
   color: #ffffff;
 }
 
+.formHero .submitBtn {
+  padding-inline: 2rem;
+}
+
 .submitBtn:hover {
   background: var(--navy-800);
 }
@@ -98,6 +104,8 @@
   list-style: none;
   font: inherit;
   font-size: 0.9rem;
+  /* Misma altura que los <select> vecinos para que la fila quede alineada. */
+  line-height: 1.25;
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -164,8 +172,7 @@
 }
 
 .moreFilters {
-  grid-column: 1 / -1;
-  margin-top: 0.35rem;
+  position: relative;
 }
 
 .moreFilters summary {
@@ -174,8 +181,8 @@
   color: var(--text-muted);
   font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.35rem 0;
-  width: fit-content;
+  padding: 0.75rem 0.25rem;
+  white-space: nowrap;
 }
 
 .moreFilters summary::-webkit-details-marker {
@@ -191,9 +198,21 @@
   content: '– ';
 }
 
-.moreFilters .field {
-  margin-top: 0.75rem;
-  max-width: 14rem;
+.morePopover {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 20;
+  min-width: 16rem;
+  max-width: min(20rem, calc(100vw - 3rem));
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
 }
 
 .quick {
@@ -236,7 +255,21 @@
 
 @media (max-width: 900px) {
   .formHero {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .moreFilters {
+    grid-column: 1 / -1;
+  }
+
+  .moreFilters summary {
+    padding: 0.2rem 0;
+    width: fit-content;
+  }
+
+  .morePopover {
+    left: 0;
+    right: auto;
   }
 }
 
@@ -246,6 +279,16 @@
   }
 
   .formHero {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* En móvil los popovers se abren en línea: flotando se salían del ancho de la pantalla. */
+  .pricePopover,
+  .morePopover {
+    position: static;
+    min-width: 0;
+    max-width: none;
+    margin-top: 0.5rem;
+    box-shadow: none;
   }
 }

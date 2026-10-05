@@ -11,16 +11,15 @@ const COPY: Record<
   }
 > = {
   'es-CO': {
-    eyebrow: 'ALTIORA INMOBILIARIA',
+    eyebrow: 'TU PRÓXIMA PROPIEDAD, AQUÍ',
     title: 'Encuentra el lugar donde\ncomienza tu próxima historia',
     subtitle:
-      'Casas, apartamentos, lotes y proyectos seleccionados en Cartago y el norte del Valle.',
+      'Casas, apartamentos, lotes y proyectos seleccionados en los mejores sectores de Colombia.',
   },
   'en-US': {
-    eyebrow: 'ALTIORA REAL ESTATE',
+    eyebrow: 'YOUR NEXT PROPERTY, HERE',
     title: 'Find the place where\nyour next story begins',
-    subtitle:
-      'Houses, apartments, lots and selected projects in Cartago and northern Valle del Cauca.',
+    subtitle: 'Houses, apartments, lots and selected projects in the best areas of Colombia.',
   },
 };
 
