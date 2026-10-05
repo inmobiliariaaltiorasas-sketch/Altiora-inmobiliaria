@@ -7,7 +7,7 @@ const COPY: Record<
   { title: string; items: Array<{ icon: typeof AwardIcon; title: string; body: string }> }
 > = {
   'es-CO': {
-    title: '¿Por qué elegir Altiora?',
+    title: '¿Por qué elegir ALTiora?',
     items: [
       {
         icon: AwardIcon,
@@ -32,7 +32,7 @@ const COPY: Record<
     ],
   },
   'en-US': {
-    title: 'Why choose Altiora?',
+    title: 'Why choose ALTiora?',
     items: [
       {
         icon: AwardIcon,

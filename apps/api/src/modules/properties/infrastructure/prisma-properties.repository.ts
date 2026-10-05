@@ -15,6 +15,7 @@ import {
   excludeDemoPropertiesWhere,
   publicPropertyWhere,
 } from '../../../common/utils/property-visibility';
+import { toSitemapEntry } from '../../../common/utils/sitemap-entry';
 import type {
   CreatePropertyInput,
   PropertiesRepository,
@@ -201,9 +202,9 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
   async listSitemapEntries(): Promise<PropertySitemapEntryDto[]> {
     const properties = await this.prisma.property.findMany({
       where: publicPropertyWhere(),
-      select: { slug: true, updatedAt: true },
+      select: { slug: true, updatedAt: true, translations: { select: { locale: true } } },
     });
-    return properties.map((p) => ({ slug: p.slug, updatedAt: p.updatedAt.toISOString() }));
+    return properties.map(toSitemapEntry);
   }
 
   private async findRelated(

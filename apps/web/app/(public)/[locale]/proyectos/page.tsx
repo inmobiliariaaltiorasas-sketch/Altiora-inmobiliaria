@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { titleForTemplate } from '@/lib/seo/brand';
 import { WhatsAppIcon } from '@/components/ui/icons';
 import styles from './page.module.css';
 
@@ -47,8 +48,10 @@ export async function generateMetadata({
   const { locale } = (await params) as { locale: SupportedLocale };
   const copy = COPY[locale];
   return {
-    title: `${locale === 'es-CO' ? 'Proyectos' : 'Projects'} | ALTiora`,
+    title: titleForTemplate(locale === 'es-CO' ? 'Proyectos' : 'Projects'),
     description: copy.metaDescription,
+    // Placeholder page: keep it out of the index but let crawlers follow its links.
+    robots: { index: false, follow: true },
   };
 }
 
@@ -65,12 +68,7 @@ export default async function ProjectsPage({ params }: { params: Promise<{ local
 
       <div className={styles.actions}>
         {whatsappLink ? (
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-gold"
-          >
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-gold">
             <WhatsAppIcon className={styles.icon} aria-hidden="true" />
             {copy.whatsappCta}
           </a>

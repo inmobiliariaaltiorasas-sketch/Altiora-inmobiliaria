@@ -5,7 +5,7 @@ import type {
   PropertySitemapEntryDto,
   SupportedLocale,
 } from '@altiora/shared-types';
-import { apiClient } from '@/lib/api-client';
+import { ApiError, apiClient } from '@/lib/api-client';
 
 export interface PropertySearchParams {
   city?: string;
@@ -42,8 +42,10 @@ export async function getPropertyBySlug(
     return await apiClient(`/properties/${slug}?locale=${locale}`, {
       next: { revalidate: 60, tags: [`property:${slug}`] },
     });
-  } catch {
-    return null;
+  } catch (error) {
+    // Only a definitive 404 means "gone"; any other failure must surface as a 5xx.
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
   }
 }
 

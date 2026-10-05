@@ -1,10 +1,10 @@
-const PRODUCTION_URL = 'https://altioraimobiliaria.online';
+import type { SupportedLocale } from '@/lib/locales';
+import { buildAlternatesFor, type PageAlternates } from './alternates';
+import { BRAND_NAME, LEGAL_NAME } from './brand';
+import { SITE_URL } from './site-url';
 
-/** Nunca cae a localhost/túnel: si falta el env, usamos el dominio real de producción. */
-export const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? PRODUCTION_URL;
-
-export const ORGANIZATION_ID = `${WEB_URL}/#organization`;
-export const WEBSITE_ID = `${WEB_URL}/#website`;
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+export const WEBSITE_ID = `${SITE_URL}/#website`;
 
 /**
  * Única fuente de datos reales de la entidad Altiora — reutilizada por JSON-LD (Organization)
@@ -12,11 +12,11 @@ export const WEBSITE_ID = `${WEB_URL}/#website`;
  * un dato real confirmado detrás.
  */
 export const ORGANIZATION_INFO = {
-  name: 'Altiora Construcciones e Inmobiliaria S.A.S.',
-  legalName: 'Altiora Construcciones e Inmobiliaria S.A.S.',
+  name: BRAND_NAME,
+  legalName: LEGAL_NAME,
   telephone: '+57 300 605 0811',
   email: 'info@altiora.com.co',
-  logo: `${WEB_URL}/altiora-logo-full.png`,
+  logo: `${SITE_URL}/altiora-logo-full.png`,
   streetAddress: 'Calle 20 # 11-18, Laureles',
   addressLocality: 'Cartago',
   addressRegion: 'Valle del Cauca',
@@ -26,14 +26,10 @@ export const ORGANIZATION_INFO = {
   knowsAbout: ['Compra de vivienda', 'Venta de propiedades', 'Arriendo', 'Asesoría inmobiliaria'],
 } as const;
 
-/** Construye `alternates` (canonical + hreflang) para una ruta pública dada, sin locale. */
-export function buildAlternates(path: string) {
-  const clean = path === '' ? '' : path.startsWith('/') ? path : `/${path}`;
-  return {
-    canonical: `${WEB_URL}/es-CO${clean}`,
-    languages: {
-      'es-CO': `${WEB_URL}/es-CO${clean}`,
-      'en-US': `${WEB_URL}/en-US${clean}`,
-    },
-  };
+/**
+ * Builds `alternates` (canonical + hreflang) for a public route that exists in every locale.
+ * The canonical references the locale being rendered; `x-default` points to es-CO.
+ */
+export function buildAlternates(locale: SupportedLocale, path: string): PageAlternates {
+  return buildAlternatesFor(SITE_URL, locale, path);
 }

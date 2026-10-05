@@ -3,12 +3,29 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { getBlogPostBySlug } from '@/lib/api/blog';
-import { buildAlternates, ORGANIZATION_ID, ORGANIZATION_INFO, WEB_URL } from '@/lib/seo/organization';
+import { resolveDetailAlternates } from '@/lib/seo/alternates';
+import { buildBreadcrumbList } from '@/lib/seo/breadcrumbs';
+import { ORGANIZATION_ID, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
+import { SITE_URL } from '@/lib/seo/site-url';
 import styles from './page.module.css';
 
-const COPY: Record<SupportedLocale, { breadcrumb: string; updatedOn: string; backToBlog: string }> = {
-  'es-CO': { breadcrumb: 'Blog', updatedOn: 'actualizado el', backToBlog: 'Volver al blog' },
-  'en-US': { breadcrumb: 'Blog', updatedOn: 'updated on', backToBlog: 'Back to blog' },
+const COPY: Record<
+  SupportedLocale,
+  { breadcrumbHome: string; breadcrumb: string; updatedOn: string; backToBlog: string }
+> = {
+  'es-CO': {
+    breadcrumbHome: 'Inicio',
+    breadcrumb: 'Blog',
+    updatedOn: 'actualizado el',
+    backToBlog: 'Volver al blog',
+  },
+  'en-US': {
+    breadcrumbHome: 'Home',
+    breadcrumb: 'Blog',
+    updatedOn: 'updated on',
+    backToBlog: 'Back to blog',
+  },
 };
 
 interface RouteParams {
@@ -35,20 +52,23 @@ export async function generateMetadata({
   const translation = resolveTranslation(post, locale);
   const title = translation?.seoTitle ?? translation?.title ?? slug;
   const description = translation?.seoDescription ?? translation?.excerpt ?? '';
-  const alternates = buildAlternates(`/blog/${slug}`);
+  const alternates = resolveDetailAlternates({
+    baseUrl: SITE_URL,
+    locale,
+    path: `/blog/${slug}`,
+    availableLocales: post.translations.map((t) => t.locale),
+  });
 
   return {
-    title,
+    ...buildSocialMetadata({
+      rawTitle: title,
+      description,
+      url: alternates.canonical,
+      fallbackImage: ORGANIZATION_INFO.logo,
+      type: 'article',
+    }),
     description,
     alternates,
-    openGraph: {
-      title,
-      description,
-      url: alternates.languages[locale],
-      siteName: 'ALTiora',
-      type: 'article',
-      images: [{ url: ORGANIZATION_INFO.logo }],
-    },
   };
 }
 
@@ -59,7 +79,7 @@ export default async function BlogPostPage({ params }: { params: Promise<RoutePa
   if (!post) notFound();
 
   const translation = resolveTranslation(post, locale);
-  const canonical = `${WEB_URL}/${locale}/blog/${slug}`;
+  const canonical = `${SITE_URL}/${locale}/blog/${slug}`;
 
   const publishedAt = post.publishedAt ? new Date(post.publishedAt) : null;
   const updatedAt = new Date(post.updatedAt);
@@ -79,14 +99,12 @@ export default async function BlogPostPage({ params }: { params: Promise<RoutePa
         dateModified: post.updatedAt,
         mainEntityOfPage: canonical,
       },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'ALTiora', item: `${WEB_URL}/${locale}` },
-          { '@type': 'ListItem', position: 2, name: 'Blog', item: `${WEB_URL}/${locale}/blog` },
-          { '@type': 'ListItem', position: 3, name: translation?.title, item: canonical },
-        ],
-      },
+      // Same trail as the visible breadcrumb below.
+      buildBreadcrumbList([
+        { name: copy.breadcrumbHome, url: `${SITE_URL}/${locale}` },
+        { name: copy.breadcrumb, url: `${SITE_URL}/${locale}/blog` },
+        { name: translation?.title ?? slug, url: canonical },
+      ]),
     ],
   };
 
@@ -101,14 +119,22 @@ export default async function BlogPostPage({ params }: { params: Promise<RoutePa
         className={`container ${styles.breadcrumb}`}
         aria-label={locale === 'es-CO' ? 'Ruta de navegación' : 'Breadcrumb'}
       >
-        <Link href={`/${locale}/blog`}>← {copy.breadcrumb}</Link>
+        <Link href={`/${locale}`}>{copy.breadcrumbHome}</Link>
+        <span aria-hidden="true">/</span>
+        <Link href={`/${locale}/blog`}>{copy.breadcrumb}</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{translation?.title ?? slug}</span>
       </nav>
 
       <article className={`container ${styles.article}`}>
         <h1 className={styles.title}>{translation?.title}</h1>
         {publishedAt ? (
           <p className={styles.meta}>
-            {publishedAt.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })}
+            {publishedAt.toLocaleDateString(locale, {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
             {wasUpdated
               ? ` · ${copy.updatedOn} ${updatedAt.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })}`
               : ''}

@@ -7,7 +7,8 @@ import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getPropertyTypes } from '@/lib/api/catalog';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
-import { buildAlternates } from '@/lib/seo/organization';
+import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
 import styles from './page.module.css';
 
 const COPY: Record<
@@ -31,7 +32,7 @@ const COPY: Record<
     description:
       'Catálogo completo de propiedades en Cartago, Valle del Cauca, con precios y disponibilidad reales.',
     emptyFiltered:
-      'No encontramos propiedades con esos filtros. Probá ampliando el rango de precio o cambiando la ciudad.',
+      'No encontramos propiedades con esos filtros. Prueba ampliando el rango de precio o cambiando la ciudad.',
     resetFilters: 'Quitar filtros',
     emptyCatalogTitle: 'Estamos preparando nuevas oportunidades',
     emptyCatalogBody:
@@ -68,12 +69,18 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
+  const alternates = buildAlternates(locale, '/propiedades');
   return {
-    title: COPY[locale].title,
+    ...buildSocialMetadata({
+      rawTitle: COPY[locale].title,
+      description: COPY[locale].description,
+      url: alternates.canonical,
+      fallbackImage: ORGANIZATION_INFO.logo,
+    }),
     description: COPY[locale].description,
     // Canonical siempre a la URL sin filtros: cualquier combinación de query params
     // (precio, habitaciones, orden, página) resuelve a esta misma página canónica.
-    alternates: buildAlternates('/propiedades'),
+    alternates,
   };
 }
 

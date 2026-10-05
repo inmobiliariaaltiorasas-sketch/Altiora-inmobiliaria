@@ -59,10 +59,14 @@ export async function Footer({ locale }: { locale: SupportedLocale }) {
     <footer className={styles.footer}>
       <div className={`container ${styles.grid}`}>
         <div className={styles.brand}>
-          <Link href={`/${locale}`} className={styles.brandLink} aria-label="ALTiora — Inicio">
+          <Link
+            href={`/${locale}`}
+            className={styles.brandLink}
+            aria-label="ALTiora Inmobiliaria — Inicio"
+          >
             <Image
               src="/altiora-logo.jpg"
-              alt="ALTiora Construcciones e Inmobiliaria S.A.S."
+              alt="ALTiora Inmobiliaria"
               width={38}
               height={38}
               className={styles.logo}
@@ -121,7 +125,7 @@ export async function Footer({ locale }: { locale: SupportedLocale }) {
       </div>
 
       <div className={styles.legal}>
-        © {new Date().getFullYear()} ALTiora Construcciones e Inmobiliaria S.A.S. — {t('rights')}
+        © {new Date().getFullYear()} Altiora Construcciones e Inmobiliaria S.A.S. — {t('rights')}
       </div>
     </footer>
   );

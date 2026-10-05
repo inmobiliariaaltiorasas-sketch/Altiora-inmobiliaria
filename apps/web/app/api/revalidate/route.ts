@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
-const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET ?? 'dev-revalidate-secret';
+import { isRevalidateRequestAuthorized, resolveRevalidateSecret } from '@/lib/revalidate-secret';
+
+const REVALIDATE_SECRET = resolveRevalidateSecret({
+  envSecret: process.env.REVALIDATE_SECRET,
+  nodeEnv: process.env.NODE_ENV,
+});
 
 /** Llamado por NestJS tras cambios de precio/disponibilidad — ver WebRevalidationService (v1 sección 22). */
 export async function POST(request: Request): Promise<NextResponse> {
-  if (request.headers.get('x-revalidate-secret') !== REVALIDATE_SECRET) {
+  if (
+    !isRevalidateRequestAuthorized(REVALIDATE_SECRET, request.headers.get('x-revalidate-secret'))
+  ) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 

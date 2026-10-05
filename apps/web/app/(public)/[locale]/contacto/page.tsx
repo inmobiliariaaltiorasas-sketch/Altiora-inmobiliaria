@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { InquiryForm } from '@/components/blocks/InquiryForm';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
-import { buildAlternates } from '@/lib/seo/organization';
+import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
 
 const COPY: Record<
   SupportedLocale,
@@ -11,7 +12,7 @@ const COPY: Record<
   'es-CO': {
     title: 'Hablemos',
     subtitle:
-      'Contanos qué estás buscando y un asesor de ALTiora te contacta por el canal que prefieras.',
+      'Cuéntanos qué estás buscando y un asesor de ALTiora te contacta por el canal que prefieras.',
     formTitle: 'Quiero que me contacten',
     whatsapp: 'Hablar por WhatsApp',
   },
@@ -30,10 +31,16 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
+  const alternates = buildAlternates(locale, '/contacto');
   return {
-    title: `${COPY[locale].title} | ALTiora`,
+    ...buildSocialMetadata({
+      rawTitle: COPY[locale].title,
+      description: COPY[locale].subtitle,
+      url: alternates.canonical,
+      fallbackImage: ORGANIZATION_INFO.logo,
+    }),
     description: COPY[locale].subtitle,
-    alternates: buildAlternates('/contacto'),
+    alternates,
   };
 }
 

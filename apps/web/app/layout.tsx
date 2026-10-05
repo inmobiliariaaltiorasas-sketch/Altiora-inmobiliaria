@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react';
+import type { Metadata } from 'next';
 import { Fraunces, IBM_Plex_Mono, Public_Sans } from 'next/font/google';
 import { getLocale } from 'next-intl/server';
+import { BRAND_NAME, TITLE_TEMPLATE } from '@/lib/seo/brand';
+import { SITE_URL } from '@/lib/seo/site-url';
 import './globals.css';
 
 const fraunces = Fraunces({
@@ -18,6 +21,12 @@ const plexMono = IBM_Plex_Mono({
   weight: ['400', '500'],
   variable: '--font-plex-mono',
 });
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  // Every public page title ends with the brand exactly once (see `titleForTemplate`).
+  title: { default: BRAND_NAME, template: TITLE_TEMPLATE },
+};
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   // Resuelto por el middleware de next-intl para rutas públicas; /admin cae al default (es-CO).

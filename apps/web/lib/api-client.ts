@@ -9,6 +9,17 @@ export function resolveMediaUrl(url: string): string {
   return /^https?:\/\//.test(url) ? url : `${API_URL}${url}`;
 }
 
+/** Non-OK API response. Extends `Error`, so existing `catch` blocks keep working unchanged. */
+export class ApiError extends Error {
+  constructor(
+    readonly path: string,
+    readonly status: number,
+  ) {
+    super(`API ${path} respondió ${status}`);
+    this.name = 'ApiError';
+  }
+}
+
 interface ApiClientOptions extends RequestInit {
   accessToken?: string;
 }
@@ -30,7 +41,7 @@ export async function apiClient<T>(path: string, options: ApiClientOptions = {})
   });
 
   if (!response.ok) {
-    throw new Error(`API ${path} respondió ${response.status}`);
+    throw new ApiError(path, response.status);
   }
 
   return response.json() as Promise<T>;

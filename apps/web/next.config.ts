@@ -1,5 +1,7 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import { SHORT_LOCALE_REDIRECTS } from './lib/seo/locale-redirects';
+import { NOINDEX_HEADER_RULES } from './lib/seo/robots-headers';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
@@ -7,6 +9,15 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   devIndicators: false,
   transpilePackages: ['@altiora/shared-types'],
+  async headers() {
+    return NOINDEX_HEADER_RULES.map((rule) => ({
+      source: rule.source,
+      headers: [...rule.headers],
+    }));
+  },
+  async redirects() {
+    return SHORT_LOCALE_REDIRECTS.map((rule) => ({ ...rule }));
+  },
   experimental: {
     serverActions: {
       // El default de 1 MB rechaza cualquier foto de celular. El admin sube de a un archivo por

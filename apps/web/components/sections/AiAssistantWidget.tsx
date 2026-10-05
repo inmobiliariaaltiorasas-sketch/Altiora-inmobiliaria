@@ -19,7 +19,7 @@ const COPY: Record<
   }
 > = {
   'es-CO': {
-    name: 'Altiora Asistente',
+    name: 'ALTiora Asistente',
     online: 'En línea',
     greeting:
       '¡Hola! Soy el asistente virtual de Altiora. Estoy aquí para ayudarte a encontrar tu propiedad ideal.',
@@ -30,7 +30,7 @@ const COPY: Record<
     open: 'Abrir asistente virtual',
   },
   'en-US': {
-    name: 'Altiora Assistant',
+    name: 'ALTiora Assistant',
     online: 'Online',
     greeting: "Hi! I'm Altiora's virtual assistant. I'm here to help you find your ideal property.",
     start: 'Start conversation',
