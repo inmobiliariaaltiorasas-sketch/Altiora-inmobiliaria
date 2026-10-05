@@ -1,5 +1,6 @@
 import type { SupportedLocale } from '@altiora/shared-types';
 import { ORGANIZATION_ID, WEBSITE_ID } from '@/lib/seo/organization';
+import { BRAND_NAME, LEGAL_NAME } from '@/lib/seo/brand';
 import { SITE_URL } from '@/lib/seo/site-url';
 
 /**
@@ -13,7 +14,8 @@ export function WebsiteJsonLd({ locale }: { locale: SupportedLocale }) {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': WEBSITE_ID,
-    name: 'Altiora',
+    name: BRAND_NAME,
+    alternateName: LEGAL_NAME,
     url: SITE_URL,
     inLanguage: locale,
     publisher: { '@id': ORGANIZATION_ID },

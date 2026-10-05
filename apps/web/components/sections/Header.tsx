@@ -32,10 +32,14 @@ export async function Header({ locale }: { locale: SupportedLocale }) {
     <header id="site-header" className={styles.header} data-scrolled="false">
       <HeaderScrollEffect />
       <div className={`container ${styles.bar}`}>
-        <Link href={`/${locale}`} className={styles.brand} aria-label="ALTiora — Inicio">
+        <Link
+          href={`/${locale}`}
+          className={styles.brand}
+          aria-label="ALTiora Inmobiliaria — Inicio"
+        >
           <Image
             src="/altiora-logo-full.png"
-            alt="ALTiora Construcciones e Inmobiliaria S.A.S."
+            alt="ALTiora Inmobiliaria"
             width={777}
             height={181}
             quality={100}

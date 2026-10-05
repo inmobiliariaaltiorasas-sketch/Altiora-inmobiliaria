@@ -14,6 +14,7 @@ export function OrganizationJsonLd() {
     '@id': ORGANIZATION_ID,
     name: ORGANIZATION_INFO.name,
     legalName: ORGANIZATION_INFO.legalName,
+    alternateName: ORGANIZATION_INFO.legalName,
     url: SITE_URL,
     logo: ORGANIZATION_INFO.logo,
     telephone: ORGANIZATION_INFO.telephone,

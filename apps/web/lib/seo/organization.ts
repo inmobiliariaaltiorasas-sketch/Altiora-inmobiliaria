@@ -1,5 +1,6 @@
 import type { SupportedLocale } from '@/lib/locales';
 import { buildAlternatesFor, type PageAlternates } from './alternates';
+import { BRAND_NAME, LEGAL_NAME } from './brand';
 import { SITE_URL } from './site-url';
 
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
@@ -11,8 +12,8 @@ export const WEBSITE_ID = `${SITE_URL}/#website`;
  * un dato real confirmado detrás.
  */
 export const ORGANIZATION_INFO = {
-  name: 'Altiora Construcciones e Inmobiliaria S.A.S.',
-  legalName: 'Altiora Construcciones e Inmobiliaria S.A.S.',
+  name: BRAND_NAME,
+  legalName: LEGAL_NAME,
   telephone: '+57 300 605 0811',
   email: 'info@altiora.com.co',
   logo: `${SITE_URL}/altiora-logo-full.png`,

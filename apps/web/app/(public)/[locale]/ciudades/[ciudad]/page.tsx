@@ -6,7 +6,9 @@ import { PropertyCard } from '@/components/blocks/PropertyCard';
 import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getCityFaqs } from '@/lib/api/content';
+import { buildBreadcrumbList } from '@/lib/seo/breadcrumbs';
 import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
 import { SITE_URL } from '@/lib/seo/site-url';
 import styles from './page.module.css';
 
@@ -64,13 +66,13 @@ function staticCityFaqs(
       id: 'static-inventory-type',
       question: `¿Qué tipo de propiedades puedo encontrar en ${cityName}?`,
       answer: hasInventory
-        ? `El catálogo de Altiora en ${cityName} incluye casas, apartamentos y lotes en venta o arriendo. Podés filtrar por tipo de propiedad y precio en nuestro buscador.`
-        : `Todavía no tenemos propiedades publicadas en ${cityName}. Hablá con un asesor de Altiora para conocer casas, apartamentos y lotes a medida que se publiquen.`,
+        ? `El catálogo de Altiora en ${cityName} incluye casas, apartamentos y lotes en venta o arriendo. Puedes filtrar por tipo de propiedad y precio en nuestro buscador.`
+        : `Todavía no tenemos propiedades publicadas en ${cityName}. Habla con un asesor de Altiora para conocer casas, apartamentos y lotes a medida que se publiquen.`,
     },
     {
       id: 'static-how-to-buy',
       question: `¿Cómo puedo comprar una propiedad en ${cityName} con Altiora?`,
-      answer: `Explorás el catálogo, contactás a un asesor de Altiora por la propiedad que te interesa, y te acompañamos en la visita, la negociación del precio y el cierre del proceso.`,
+      answer: `Exploras el catálogo, contactas a un asesor de Altiora por la propiedad que te interesa, y te acompañamos en la visita, la negociación del precio y el cierre del proceso.`,
     },
     {
       id: 'static-sell-help',
@@ -80,12 +82,12 @@ function staticCityFaqs(
     {
       id: 'static-valuation',
       question: '¿Cómo solicitar una valoración de mi inmueble?',
-      answer: `Completá el formulario para propietarios en nuestro sitio con los datos de tu inmueble, o escribinos directamente, y un asesor de Altiora te va a contactar para coordinar la valoración.`,
+      answer: `Completa el formulario para propietarios en nuestro sitio con los datos de tu inmueble, o escríbenos directamente, y un asesor de Altiora te va a contactar para coordinar la valoración.`,
     },
     {
       id: 'static-contact-advisor',
       question: `¿Cómo contactar a un asesor inmobiliario en ${cityName}?`,
-      answer: `Podés escribirnos por el formulario de contacto o WhatsApp en nuestro sitio, o llamar al 300 605 0811.`,
+      answer: `Puedes escribirnos por el formulario de contacto o WhatsApp en nuestro sitio, o llamar al 300 605 0811.`,
     },
   ];
 }
@@ -93,6 +95,7 @@ function staticCityFaqs(
 const COPY: Record<
   SupportedLocale,
   {
+    breadcrumbHome: string;
     breadcrumbCities: string;
     titleSuffix: string;
     empty: string;
@@ -102,6 +105,7 @@ const COPY: Record<
   }
 > = {
   'es-CO': {
+    breadcrumbHome: 'Inicio',
     breadcrumbCities: 'Zonas',
     titleSuffix: 'propiedades en venta y arriendo',
     empty: 'Todavía no hay propiedades publicadas en esta zona.',
@@ -110,6 +114,7 @@ const COPY: Record<
     faq: 'Preguntas frecuentes',
   },
   'en-US': {
+    breadcrumbHome: 'Home',
     breadcrumbCities: 'Cities',
     titleSuffix: 'properties for sale and rent',
     empty: 'No properties are published in this city yet.',
@@ -136,8 +141,8 @@ export async function generateMetadata({
 
   const title =
     locale === 'en-US'
-      ? `Properties in ${city.name}, ${city.department} | Altiora`
-      : `Propiedades en ${city.name}, ${city.department} | Altiora`;
+      ? `Properties in ${city.name}, ${city.department}`
+      : `Propiedades en ${city.name}, ${city.department}`;
   const description =
     locale === 'en-US'
       ? `Explore real estate opportunities in ${city.name}, ${city.department}. Houses, apartments, lots and real estate guidance with Altiora.`
@@ -145,17 +150,14 @@ export async function generateMetadata({
   const alternates = buildAlternates(locale, `/ciudades/${ciudad}`);
 
   return {
-    title,
+    ...buildSocialMetadata({
+      rawTitle: title,
+      description,
+      url: alternates.canonical,
+      fallbackImage: ORGANIZATION_INFO.logo,
+    }),
     description,
     alternates,
-    openGraph: {
-      title,
-      description,
-      url: alternates.languages[locale],
-      siteName: 'ALTiora',
-      type: 'website',
-      images: [{ url: ORGANIZATION_INFO.logo }],
-    },
   };
 }
 
@@ -189,19 +191,14 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
         }
       : null;
 
+  // Same trail as the visible breadcrumb below.
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Altiora', item: `${SITE_URL}/${locale}` },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: copy.breadcrumbCities,
-        item: `${SITE_URL}/${locale}/ciudades`,
-      },
-      { '@type': 'ListItem', position: 3, name: city.name, item: cityUrl },
-    ],
+    ...buildBreadcrumbList([
+      { name: copy.breadcrumbHome, url: `${SITE_URL}/${locale}` },
+      { name: copy.breadcrumbCities, url: `${SITE_URL}/${locale}/ciudades` },
+      { name: city.name, url: cityUrl },
+    ]),
   };
 
   return (
@@ -221,6 +218,8 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
         className={`container ${styles.breadcrumb}`}
         aria-label={locale === 'es-CO' ? 'Ruta de navegación' : 'Breadcrumb'}
       >
+        <Link href={`/${locale}`}>{copy.breadcrumbHome}</Link>
+        <span aria-hidden="true">/</span>
         <Link href={`/${locale}/ciudades`}>{copy.breadcrumbCities}</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{city.name}</span>

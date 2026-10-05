@@ -68,7 +68,7 @@ signals:
   - Admin: `noindex, nofollow` metadata plus `X-Robots-Tag` header on `/admin` and `/api`.
   - Revalidation route: no default secret outside development.
   - `/proyectos` and `/calculadora-credito`: `noindex, follow`, removed from the sitemap.
-- [ ] T3 Titles, entity and property schema. Route: delegated writer.
+- [x] T3 Titles, entity and property schema. Route: delegated writer.
   - Single brand constant; title template so every public page ends with the brand once.
   - Property JSON-LD: correct type mapping, bedrooms, bathrooms, floor size, `url`; breadcrumb
     JSON-LD matches the visible breadcrumb.
@@ -115,12 +115,28 @@ signals:
 - Not exercised against a running server: the `/en` and `/es` redirects (unit-tested rules only).
 - Decisions: redirects live in `next.config.ts` (applied before the next-intl middleware); a canonical override applies only when it belongs to the requested locale; sitemap entries without `locales` (older API) list es-CO only, so web can deploy before the API.
 
-### T2 (2026-10-05)
+### T2 (2026-10-05), commit e35965c
 - `npm run test --workspace=apps/web`: 8 files, 52 tests passed (RED observed first for the typed API error, both detail fetchers, the revalidation-secret helper and the header rules).
 - `npm test --workspace=apps/api`: 1 suite, 4 tests passed. Typecheck in both apps and `npm run lint`: clean. Prettier (`--end-of-line auto`) on the 15 touched files: clean.
 - Not run: `npm run build` (needs a reachable API, see T1). Not exercised against a running server: the 5xx status on an API failure, the `X-Robots-Tag` header.
 - No `error.tsx` or `global-error.tsx` exists under `apps/web/app`, so a thrown fetch error uses the default Next error response (500, unbranded).
 - Deploy prerequisite: `REVALIDATE_SECRET` must be set in the web Worker. The API still defaults to `dev-revalidate-secret` (`web-revalidation.service.ts:27`); if production relied on that default on both sides, push revalidation is rejected after this change until the variable is set on both. Content still refreshes through the 60 s fetch revalidation.
 
+### T3 (2026-10-05)
+- `npm run test --workspace=apps/web`: 13 files, 83 tests passed (RED observed first for the brand/title helper, the schema-type mapping, the property JSON-LD builder, the breadcrumb builder and the social-metadata helper).
+- `npm test --workspace=apps/api`: 1 suite, 4 tests passed. Typecheck in both apps and `npm run lint`: clean.
+- Search for hand-written brand suffixes in `apps/web/app` and `apps/web/components`: only the intentional admin title template remains.
+- Not run: `npm run build`. Not checked in a browser: the rendered titles, the JSON-LD output and the new breadcrumb levels.
+- Finding: the type mapping in code was already correct (`casa` to `House`). The production listing titled "Casa" that emits `Apartment` is stored with the apartment property type: a data fix in the admin, not code.
+- Parent follow-up on the writer output: the city and blog post breadcrumbs gained a home level, and the blog post breadcrumb gained the post title, both visibly and in JSON-LD (the brief asks for `Inicio > ...`; a one-item list is not eligible for the breadcrumb rich result). Blog breadcrumb CSS aligned with the city page.
+- Land and other non-residential types map to schema.org `Place`, without bedrooms, bathrooms or floor size. No lot-size property was added.
+- Prose that mentions "Altiora" inside descriptions and FAQ answers was left as written.
+
+## Pending decisions for the user
+- Sold / paused / archived properties: keep 404, or serve a "sold" page.
+- Chain strategy for the pull request(s); push and deploy.
+- `REVALIDATE_SECRET` in production (see T2).
+- A branded error page for API outages.
+
 ## Next step
-T3.
+User review of stage 1; then stage 2 (analytics).

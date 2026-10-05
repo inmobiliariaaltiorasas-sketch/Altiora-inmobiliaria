@@ -4,6 +4,7 @@ import type { SupportedLocale } from '@altiora/shared-types';
 import { getLocationsTree } from '@/lib/api/locations';
 import { PinIcon } from '@/components/ui/icons';
 import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
 import styles from './page.module.css';
 
 const COPY: Record<
@@ -38,17 +39,14 @@ export async function generateMetadata({
   const alternates = buildAlternates(locale, '/ciudades');
 
   return {
-    title: `${copy.title} | ALTiora`,
+    ...buildSocialMetadata({
+      rawTitle: copy.title,
+      description: copy.lede,
+      url: alternates.canonical,
+      fallbackImage: ORGANIZATION_INFO.logo,
+    }),
     description: copy.lede,
     alternates,
-    openGraph: {
-      title: `${copy.title} | ALTiora`,
-      description: copy.lede,
-      url: alternates.languages[locale],
-      siteName: 'ALTiora',
-      type: 'website',
-      images: [{ url: ORGANIZATION_INFO.logo }],
-    },
   };
 }
 

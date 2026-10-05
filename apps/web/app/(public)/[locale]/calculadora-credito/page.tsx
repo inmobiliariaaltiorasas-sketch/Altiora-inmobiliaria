@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
+import { titleForTemplate } from '@/lib/seo/brand';
 
 const COPY: Record<SupportedLocale, { title: string; body: string }> = {
   'es-CO': {
@@ -19,7 +20,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
   return {
-    title: `${COPY[locale].title} | ALTiora`,
+    title: titleForTemplate(COPY[locale].title),
     // Placeholder page: keep it out of the index but let crawlers follow its links.
     robots: { index: false, follow: true },
   };

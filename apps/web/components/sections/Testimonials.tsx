@@ -9,8 +9,8 @@ export interface Testimonial {
 }
 
 const TITLE: Record<SupportedLocale, string> = {
-  'es-CO': 'Lo que dicen quienes ya confiaron en Altiora',
-  'en-US': 'What people who trusted Altiora say',
+  'es-CO': 'Lo que dicen quienes ya confiaron en ALTiora',
+  'en-US': 'What people who trusted ALTiora say',
 };
 
 /**

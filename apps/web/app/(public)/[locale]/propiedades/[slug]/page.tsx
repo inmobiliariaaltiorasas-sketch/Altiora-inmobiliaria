@@ -14,20 +14,12 @@ import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { ShareButton } from '@/components/ui/ShareButton';
 import { formatArea, formatPrice, formatUsdEstimate } from '@/lib/format';
 import { resolveDetailAlternates } from '@/lib/seo/alternates';
+import { buildBreadcrumbList } from '@/lib/seo/breadcrumbs';
+import { buildPropertyJsonLd } from '@/lib/seo/property-jsonld';
+import { buildSocialMetadata } from '@/lib/seo/social';
 import { ORGANIZATION_INFO } from '@/lib/seo/organization';
 import { SITE_URL } from '@/lib/seo/site-url';
 import styles from './page.module.css';
-
-/**
- * Schema.org no define "RealEstateListing" como tipo estándar validable — usamos el tipo de
- * inmueble real (House/Apartment) cuando lo conocemos, y `Residence` como base semánticamente
- * correcta para el resto (ej. lotes), en vez de un `Product` genérico.
- */
-function propertyJsonLdType(propertyTypeSlug: string): string {
-  if (propertyTypeSlug === 'casa') return 'House';
-  if (propertyTypeSlug === 'apartamento') return 'Apartment';
-  return 'Residence';
-}
 
 const COPY: Record<
   SupportedLocale,
@@ -118,6 +110,24 @@ function resolveTranslation(
   return property.translations.find((t) => t.locale === locale) ?? property.translations[0];
 }
 
+/** Canonical + hreflang shared by the metadata and the structured data of the same page. */
+function propertyAlternates(
+  property: NonNullable<Awaited<ReturnType<typeof getPropertyBySlug>>>,
+  locale: SupportedLocale,
+  slug: string,
+) {
+  const translation = resolveTranslation(property, locale);
+  return resolveDetailAlternates({
+    baseUrl: SITE_URL,
+    locale,
+    path: `/propiedades/${slug}`,
+    availableLocales: property.translations.map((t) => t.locale),
+    // Only an override written for the requested locale applies; a fallback translation's does not.
+    canonicalOverride:
+      translation?.locale === locale ? translation.seoCanonicalOverride : undefined,
+  });
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -130,33 +140,20 @@ export async function generateMetadata({
   const translation = resolveTranslation(property, locale);
   const title = translation?.seoTitle ?? translation?.title ?? slug;
   const description = translation?.seoDescription ?? translation?.shortDescription ?? '';
-  const { canonical, languages } = resolveDetailAlternates({
-    baseUrl: SITE_URL,
-    locale,
-    path: `/propiedades/${slug}`,
-    availableLocales: property.translations.map((t) => t.locale),
-    // Only an override written for the requested locale applies; a fallback translation's does not.
-    canonicalOverride:
-      translation?.locale === locale ? translation.seoCanonicalOverride : undefined,
-  });
-  const image = property.media[0] ? resolveMediaUrl(property.media[0].url) : ORGANIZATION_INFO.logo;
+  const { canonical, languages } = propertyAlternates(property, locale, slug);
+  // Absolute URL: relative media paths point at the API host, not at the web origin.
+  const image = property.media[0] ? resolveMediaUrl(property.media[0].url) : undefined;
 
   return {
-    title,
-    description,
-    alternates: { canonical, languages },
-    openGraph: {
-      title,
+    ...buildSocialMetadata({
+      rawTitle: title,
       description,
       url: canonical,
-      images: [{ url: image }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [image],
-    },
+      image,
+      fallbackImage: ORGANIZATION_INFO.logo,
+    }),
+    description,
+    alternates: { canonical, languages },
   };
 }
 
@@ -172,53 +169,31 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
   const usdEstimate =
     locale === 'en-US' ? formatUsdEstimate(property.price, property.currency, fxRate) : null;
   const translation = resolveTranslation(property, locale);
+  // `canonical` is the URL being rendered (share links); `structuredUrl` is the canonical the
+  // metadata declares, so the structured data points at the same URL.
   const canonical = `${SITE_URL}/${locale}/propiedades/${slug}`;
+  const structuredUrl = propertyAlternates(property, locale, slug).canonical;
   const propertyTitle = translation?.title ?? slug;
   const locationLabel = property.location.neighborhood
     ? `${property.location.neighborhood.name}, ${property.location.city.name}`
     : `${property.location.city.name}, ${property.location.city.department}`;
 
+  const breadcrumb = [
+    { name: copy.breadcrumbHome, url: `${SITE_URL}/${locale}` },
+    { name: copy.breadcrumbProperties, url: `${SITE_URL}/${locale}/propiedades` },
+    {
+      name: property.location.city.name,
+      url: `${SITE_URL}/${locale}/ciudades/${property.location.city.slug}`,
+    },
+    { name: propertyTitle, url: structuredUrl },
+  ];
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': propertyJsonLdType(property.propertyType.slug),
-        name: translation?.title,
-        description: translation?.shortDescription,
-        image: property.media.map((m) => m.url),
-        address: {
-          '@type': 'PostalAddress',
-          ...(property.location.addressLine
-            ? { streetAddress: property.location.addressLine }
-            : {}),
-          addressLocality: property.location.city.name,
-          addressRegion: property.location.city.department,
-          addressCountry: 'CO',
-        },
-        offers: {
-          '@type': 'Offer',
-          price: property.price,
-          priceCurrency: property.currency,
-          availability:
-            property.status === 'PUBLISHED'
-              ? 'https://schema.org/InStock'
-              : 'https://schema.org/OutOfStock',
-          url: canonical,
-        },
-      },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'ALTiora', item: `${SITE_URL}/${locale}` },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: copy.breadcrumbProperties,
-            item: `${SITE_URL}/${locale}/propiedades`,
-          },
-          { '@type': 'ListItem', position: 3, name: translation?.title, item: canonical },
-        ],
-      },
+      buildPropertyJsonLd({ property, translation, url: structuredUrl }),
+      // Same trail as the visible breadcrumb below.
+      buildBreadcrumbList(breadcrumb),
     ],
   };
 

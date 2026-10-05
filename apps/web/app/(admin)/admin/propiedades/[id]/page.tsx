@@ -368,7 +368,7 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
           <PropertyMediaUploadForm action={addMedia} remaining={remainingPhotos} />
         ) : (
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '1.25rem' }}>
-            Llegaste al máximo de {MAX_PHOTOS} fotos. Eliminá alguna para subir otra.
+            Llegaste al máximo de {MAX_PHOTOS} fotos. Elimina alguna para subir otra.
           </p>
         )}
       </div>
@@ -384,7 +384,7 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
         <h2 style={{ fontSize: '1.1rem', color: '#b3261e' }}>Eliminar propiedad</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.2rem' }}>
           Borra la propiedad, su historial y sus fotos para siempre. No se puede deshacer — si solo
-          querés quitarla de la web, usá &quot;Archivar&quot; en su lugar.
+          quieres quitarla de la web, usa &quot;Archivar&quot; en su lugar.
         </p>
         <form action={deleteProperty} style={{ marginTop: '0.85rem' }}>
           <ConfirmSubmitButton

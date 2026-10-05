@@ -24,7 +24,7 @@ export function BrandBlock() {
       <div className={styles.panel}>
         <Image
           src="/altiora-logo.jpg"
-          alt="ALTiora Construcciones e Inmobiliaria S.A.S."
+          alt="ALTiora Inmobiliaria"
           width={44}
           height={44}
           className={styles.logo}

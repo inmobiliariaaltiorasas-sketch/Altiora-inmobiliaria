@@ -14,6 +14,7 @@ import { searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getPropertyTypes } from '@/lib/api/catalog';
 import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
 import styles from './page.module.css';
 
 // Sin testimonios reales todavía — el componente se oculta solo mientras esta lista esté vacía.
@@ -36,7 +37,7 @@ const COPY: Record<
   }
 > = {
   'es-CO': {
-    title: 'Inmobiliaria en Cartago | Casas, apartamentos y lotes | Altiora',
+    title: 'Inmobiliaria en Cartago | Casas, apartamentos y lotes',
     description:
       'Encuentra casas, apartamentos y lotes en Cartago, Valle del Cauca. Compra, vende o arrienda con acompañamiento inmobiliario de Altiora.',
     featuredEyebrow: 'PROPIEDADES DESTACADAS',
@@ -55,7 +56,7 @@ const COPY: Record<
     ],
   },
   'en-US': {
-    title: 'Real Estate in Cartago | Houses, Apartments and Lots | Altiora',
+    title: 'Real Estate in Cartago | Houses, Apartments and Lots',
     description:
       'Find houses, apartments and lots in Cartago, Valle del Cauca. Buy, sell or rent with real estate guidance from Altiora.',
     featuredEyebrow: 'FEATURED PROPERTIES',
@@ -85,22 +86,14 @@ export async function generateMetadata({
   const alternates = buildAlternates(locale, '');
 
   return {
-    title: copy.title,
+    ...buildSocialMetadata({
+      rawTitle: copy.title,
+      description: copy.description,
+      url: alternates.canonical,
+      fallbackImage: ORGANIZATION_INFO.logo,
+    }),
     description: copy.description,
     alternates,
-    openGraph: {
-      title: copy.title,
-      description: copy.description,
-      url: alternates.languages[locale],
-      siteName: 'ALTiora',
-      type: 'website',
-      images: [{ url: ORGANIZATION_INFO.logo }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: copy.title,
-      description: copy.description,
-    },
   };
 }
 

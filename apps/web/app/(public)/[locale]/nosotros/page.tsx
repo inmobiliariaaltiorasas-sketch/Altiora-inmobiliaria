@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { FinalCta } from '@/components/sections/FinalCta';
-import { buildAlternates } from '@/lib/seo/organization';
+import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
 import styles from './page.module.css';
 
 interface Step {
@@ -83,8 +84,8 @@ const COPY: Record<
       },
     ],
     metaDescription:
-      'Conocé cómo trabaja Altiora Construcciones e Inmobiliaria: acompañamiento real en la compra, venta y arriendo de propiedades en Cartago y el norte del Valle.',
-    inCartagoTitle: 'Altiora en Cartago',
+      'Conoce cómo trabaja Altiora Construcciones e Inmobiliaria: acompañamiento real en la compra, venta y arriendo de propiedades en Cartago y el norte del Valle.',
+    inCartagoTitle: 'ALTiora en Cartago',
     inCartagoBody:
       'Altiora Construcciones e Inmobiliaria S.A.S. opera en Cartago y el norte del Valle del Cauca, ofreciendo servicios de compra, venta, arriendo y valoración/asesoría inmobiliaria. Trabajamos con inventario verificado y acompañamos a compradores, arrendatarios y propietarios en cada etapa del proceso.',
   },
@@ -142,7 +143,7 @@ const COPY: Record<
     ],
     metaDescription:
       "Learn how Altiora Construcciones e Inmobiliaria works: real guidance for buying, selling and renting properties in Cartago and northern Valle del Cauca.",
-    inCartagoTitle: 'Altiora in Cartago',
+    inCartagoTitle: 'ALTiora in Cartago',
     inCartagoBody:
       'Altiora Construcciones e Inmobiliaria S.A.S. operates in Cartago and northern Valle del Cauca, offering buying, selling, renting and valuation/real estate advisory services. We work with a verified inventory and support buyers, tenants and property owners at every stage of the process.',
   },
@@ -155,10 +156,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
   const copy = COPY[locale];
+  const alternates = buildAlternates(locale, '/nosotros');
   return {
-    title: `${locale === 'es-CO' ? 'Nosotros' : 'About us'} | ALTiora`,
+    ...buildSocialMetadata({
+      rawTitle: locale === 'es-CO' ? 'Nosotros' : 'About us',
+      description: copy.metaDescription,
+      url: alternates.canonical,
+      fallbackImage: ORGANIZATION_INFO.logo,
+    }),
     description: copy.metaDescription,
-    alternates: buildAlternates(locale, '/nosotros'),
+    alternates,
   };
 }
 

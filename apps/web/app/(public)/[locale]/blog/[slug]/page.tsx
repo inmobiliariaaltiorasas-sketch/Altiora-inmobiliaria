@@ -4,15 +4,29 @@ import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
 import { getBlogPostBySlug } from '@/lib/api/blog';
 import { resolveDetailAlternates } from '@/lib/seo/alternates';
+import { buildBreadcrumbList } from '@/lib/seo/breadcrumbs';
 import { ORGANIZATION_ID, ORGANIZATION_INFO } from '@/lib/seo/organization';
+import { buildSocialMetadata } from '@/lib/seo/social';
 import { SITE_URL } from '@/lib/seo/site-url';
 import styles from './page.module.css';
 
-const COPY: Record<SupportedLocale, { breadcrumb: string; updatedOn: string; backToBlog: string }> =
-  {
-    'es-CO': { breadcrumb: 'Blog', updatedOn: 'actualizado el', backToBlog: 'Volver al blog' },
-    'en-US': { breadcrumb: 'Blog', updatedOn: 'updated on', backToBlog: 'Back to blog' },
-  };
+const COPY: Record<
+  SupportedLocale,
+  { breadcrumbHome: string; breadcrumb: string; updatedOn: string; backToBlog: string }
+> = {
+  'es-CO': {
+    breadcrumbHome: 'Inicio',
+    breadcrumb: 'Blog',
+    updatedOn: 'actualizado el',
+    backToBlog: 'Volver al blog',
+  },
+  'en-US': {
+    breadcrumbHome: 'Home',
+    breadcrumb: 'Blog',
+    updatedOn: 'updated on',
+    backToBlog: 'Back to blog',
+  },
+};
 
 interface RouteParams {
   locale: string;
@@ -46,17 +60,15 @@ export async function generateMetadata({
   });
 
   return {
-    title,
-    description,
-    alternates,
-    openGraph: {
-      title,
+    ...buildSocialMetadata({
+      rawTitle: title,
       description,
       url: alternates.canonical,
-      siteName: 'ALTiora',
+      fallbackImage: ORGANIZATION_INFO.logo,
       type: 'article',
-      images: [{ url: ORGANIZATION_INFO.logo }],
-    },
+    }),
+    description,
+    alternates,
   };
 }
 
@@ -87,14 +99,12 @@ export default async function BlogPostPage({ params }: { params: Promise<RoutePa
         dateModified: post.updatedAt,
         mainEntityOfPage: canonical,
       },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'ALTiora', item: `${SITE_URL}/${locale}` },
-          { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/${locale}/blog` },
-          { '@type': 'ListItem', position: 3, name: translation?.title, item: canonical },
-        ],
-      },
+      // Same trail as the visible breadcrumb below.
+      buildBreadcrumbList([
+        { name: copy.breadcrumbHome, url: `${SITE_URL}/${locale}` },
+        { name: copy.breadcrumb, url: `${SITE_URL}/${locale}/blog` },
+        { name: translation?.title ?? slug, url: canonical },
+      ]),
     ],
   };
 
@@ -109,7 +119,11 @@ export default async function BlogPostPage({ params }: { params: Promise<RoutePa
         className={`container ${styles.breadcrumb}`}
         aria-label={locale === 'es-CO' ? 'Ruta de navegación' : 'Breadcrumb'}
       >
-        <Link href={`/${locale}/blog`}>← {copy.breadcrumb}</Link>
+        <Link href={`/${locale}`}>{copy.breadcrumbHome}</Link>
+        <span aria-hidden="true">/</span>
+        <Link href={`/${locale}/blog`}>{copy.breadcrumb}</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{translation?.title ?? slug}</span>
       </nav>
 
       <article className={`container ${styles.article}`}>
