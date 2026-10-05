@@ -9,7 +9,14 @@ import styles from './page.module.css';
 
 const COPY: Record<
   SupportedLocale,
-  { eyebrow: string; title: string; lede: string; neighborhoods: string; viewProperties: string; empty: string }
+  {
+    eyebrow: string;
+    title: string;
+    lede: string;
+    neighborhoods: string;
+    viewProperties: string;
+    empty: string;
+  }
 > = {
   'es-CO': {
     eyebrow: 'EXPLORA POR ZONAS',
@@ -114,7 +121,10 @@ export default async function CitiesDirectoryPage({
                 <p className={styles.cityDepartment}>{city.department}</p>
                 {city.neighborhoods.length > 0 ? (
                   <div className={styles.cityMeta}>
-                    <span className="badge" style={{ background: 'var(--surface-2)', color: 'var(--navy-900)' }}>
+                    <span
+                      className="badge"
+                      style={{ background: 'var(--surface-2)', color: 'var(--navy-900)' }}
+                    >
                       {city.neighborhoods.length} {copy.neighborhoods}
                     </span>
                   </div>

@@ -142,7 +142,7 @@ const COPY: Record<
       },
     ],
     metaDescription:
-      "Learn how Altiora Construcciones e Inmobiliaria works: real guidance for buying, selling and renting properties in Cartago and northern Valle del Cauca.",
+      'Learn how Altiora Construcciones e Inmobiliaria works: real guidance for buying, selling and renting properties in Cartago and northern Valle del Cauca.',
     inCartagoTitle: 'ALTiora in Cartago',
     inCartagoBody:
       'Altiora Construcciones e Inmobiliaria S.A.S. operates in Cartago and northern Valle del Cauca, offering buying, selling, renting and valuation/real estate advisory services. We work with a verified inventory and support buyers, tenants and property owners at every stage of the process.',

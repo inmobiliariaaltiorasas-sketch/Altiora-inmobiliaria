@@ -61,12 +61,7 @@ export function PropertyLocationMap({
 
   return (
     <div className={styles.wrapper}>
-      <iframe
-        src={embedSrc}
-        title={copy.iframeTitle}
-        loading="lazy"
-        className={styles.frame}
-      />
+      <iframe src={embedSrc} title={copy.iframeTitle} loading="lazy" className={styles.frame} />
       <a href={googleMapsHref} target="_blank" rel="noopener noreferrer" className={styles.link}>
         {copy.viewOnGoogleMaps}
       </a>

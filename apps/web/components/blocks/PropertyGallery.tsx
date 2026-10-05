@@ -7,9 +7,22 @@ import { resolveMediaUrl } from '@/lib/api-client';
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/icons';
 import styles from './PropertyGallery.module.css';
 
-const COPY: Record<SupportedLocale, { viewAll: string; close: string; prev: string; next: string }> = {
-  'es-CO': { viewAll: 'Ver todas las fotos', close: 'Cerrar', prev: 'Foto anterior', next: 'Foto siguiente' },
-  'en-US': { viewAll: 'View all photos', close: 'Close', prev: 'Previous photo', next: 'Next photo' },
+const COPY: Record<
+  SupportedLocale,
+  { viewAll: string; close: string; prev: string; next: string }
+> = {
+  'es-CO': {
+    viewAll: 'Ver todas las fotos',
+    close: 'Cerrar',
+    prev: 'Foto anterior',
+    next: 'Foto siguiente',
+  },
+  'en-US': {
+    viewAll: 'View all photos',
+    close: 'Close',
+    prev: 'Previous photo',
+    next: 'Next photo',
+  },
 };
 
 /**
@@ -90,7 +103,11 @@ export function PropertyGallery({
       </div>
 
       {photos.length > 1 ? (
-        <button type="button" className={`btn btn-outline ${styles.viewAllBtn}`} onClick={() => openAt(0)}>
+        <button
+          type="button"
+          className={`btn btn-outline ${styles.viewAllBtn}`}
+          onClick={() => openAt(0)}
+        >
           {copy.viewAll}
         </button>
       ) : null}
@@ -113,7 +130,12 @@ export function PropertyGallery({
 
         <div className={styles.stage}>
           {photos.length > 1 ? (
-            <button type="button" className={styles.navBtn} onClick={() => go(-1)} aria-label={copy.prev}>
+            <button
+              type="button"
+              className={styles.navBtn}
+              onClick={() => go(-1)}
+              aria-label={copy.prev}
+            >
               <ChevronLeftIcon className={styles.navIcon} />
             </button>
           ) : null}
@@ -129,7 +151,12 @@ export function PropertyGallery({
           </div>
 
           {photos.length > 1 ? (
-            <button type="button" className={styles.navBtn} onClick={() => go(1)} aria-label={copy.next}>
+            <button
+              type="button"
+              className={styles.navBtn}
+              onClick={() => go(1)}
+              aria-label={copy.next}
+            >
               <ChevronRightIcon className={styles.navIcon} />
             </button>
           ) : null}

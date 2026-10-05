@@ -17,7 +17,10 @@ import {
 } from '@altiora/shared-types';
 import { slugify } from '../../../common/utils/slugify';
 import { WebRevalidationService } from '../../../common/services/web-revalidation.service';
-import { FILE_STORAGE, type FileStorageService } from '../../../common/services/file-storage.interface';
+import {
+  FILE_STORAGE,
+  type FileStorageService,
+} from '../../../common/services/file-storage.interface';
 import { CitiesService } from '../../cities/application/cities.service';
 import { AuditLogsService } from '../../audit-logs/application/audit-logs.service';
 import { PROPERTIES_REPOSITORY, type PropertiesRepository } from '../domain/properties.repository';

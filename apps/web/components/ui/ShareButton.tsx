@@ -8,7 +8,17 @@ import styles from './ShareButton.module.css';
  * Web Share API con fallback a copiar el link — sin backend, no requiere infraestructura de
  * "compartir" que el proyecto no tiene todavía.
  */
-export function ShareButton({ url, title, label, copiedLabel }: { url: string; title: string; label: string; copiedLabel: string }) {
+export function ShareButton({
+  url,
+  title,
+  label,
+  copiedLabel,
+}: {
+  url: string;
+  title: string;
+  label: string;
+  copiedLabel: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
@@ -30,7 +40,12 @@ export function ShareButton({ url, title, label, copiedLabel }: { url: string; t
   }
 
   return (
-    <button type="button" className={styles.button} aria-label={copied ? copiedLabel : label} onClick={handleShare}>
+    <button
+      type="button"
+      className={styles.button}
+      aria-label={copied ? copiedLabel : label}
+      onClick={handleShare}
+    >
       <ShareIcon className={styles.icon} />
     </button>
   );
