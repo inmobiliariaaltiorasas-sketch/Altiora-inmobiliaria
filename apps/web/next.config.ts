@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       // Solo para imágenes de ejemplo del seed de Fase 1 — se retira al cargar fotos reales.
       { protocol: 'https', hostname: 'picsum.photos' },
+      // Bucket público de R2 (R2_PUBLIC_URL en apps/api) — fotos reales de propiedades.
+      // Si se cambia a un dominio propio, hay que actualizar este host y redeployar.
+      { protocol: 'https', hostname: 'pub-7af76bf3a99542dc8b5a9ac27b7f09c8.r2.dev' },
       { protocol: 'http', hostname: 'localhost', port: '4000', pathname: '/property-media/**' },
     ],
   },
