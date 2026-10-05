@@ -7,7 +7,6 @@ import { SessionTracker } from '@/components/sections/SessionTracker';
 import { OrganizationJsonLd } from '@/components/sections/OrganizationJsonLd';
 import { WebsiteJsonLd } from '@/components/sections/WebsiteJsonLd';
 import { WhatsAppButton } from '@/components/sections/WhatsAppButton';
-import { AiAssistantWidget } from '@/components/sections/AiAssistantWidget';
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
@@ -31,7 +30,8 @@ export default async function PublicLocaleLayout({
       <Header locale={locale} />
       {children}
       <Footer locale={locale} />
-      <AiAssistantWidget locale={locale} />
+      {/* AiAssistantWidget desmontado a pedido del negocio (2026-10): el asistente todavía no
+          está listo. El componente sigue en components/sections para volver a montarlo. */}
       <WhatsAppButton locale={locale} />
     </>
   );
