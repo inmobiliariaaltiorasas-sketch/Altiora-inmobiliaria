@@ -1,0 +1,62 @@
+/* minmax(0, 1fr) en todas las grillas: con `1fr` a secas el ancho intrínseco de los
+   inputs numéricos ensancha la columna y los campos se salen de la tarjeta. */
+.form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem 2rem;
+  align-items: start;
+  padding: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.column {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.row2,
+.row3 {
+  display: grid;
+  gap: 1rem;
+}
+
+.row2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.row3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  min-width: 0;
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (min-width: 960px) {
+  .form {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .row3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
