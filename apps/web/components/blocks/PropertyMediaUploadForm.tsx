@@ -1,10 +1,13 @@
 'use client';
 
 import { useRef, useState, type FormEvent } from 'react';
+import { shrinkImage } from '@/lib/shrink-image';
 
 /** Debe quedar por debajo de `serverActions.bodySizeLimit` en next.config.ts. */
 const MAX_FILE_BYTES = 15 * 1024 * 1024;
 const MAX_FILE_LABEL = '15 MB';
+
+class FileTooBigError extends Error {}
 
 interface PropertyMediaUploadFormProps {
   action: (formData: FormData) => Promise<void>;
@@ -34,28 +37,27 @@ export function PropertyMediaUploadForm({ action, remaining }: PropertyMediaUplo
       setError(`Elegiste ${files.length} archivos y solo quedan ${remaining} lugares.`);
       return;
     }
-    const tooBig = files.find((file) => file.size > MAX_FILE_BYTES);
-    if (tooBig) {
-      setError(`"${tooBig.name}" pesa más de ${MAX_FILE_LABEL}. Reducila y volvé a intentar.`);
-      return;
-    }
-
     let uploaded = 0;
     try {
       for (const file of files) {
         setProgress({ current: uploaded + 1, total: files.length });
+        // El tope se valida después de reducir: una foto de celular de 20 MB queda muy por debajo.
+        const prepared = await shrinkImage(file);
+        if (prepared.size > MAX_FILE_BYTES) throw new FileTooBigError();
         const single = new FormData();
         single.set('type', type);
-        single.set('file', file);
+        single.set('file', prepared);
         await action(single);
         uploaded += 1;
       }
       formRef.current?.reset();
-    } catch {
-      const failed = files[uploaded];
-      setError(
-        `No se pudo subir "${failed?.name ?? 'el archivo'}". Se subieron ${uploaded} de ${files.length}.`,
-      );
+    } catch (cause) {
+      const name = files[uploaded]?.name ?? 'el archivo';
+      const reason =
+        cause instanceof FileTooBigError
+          ? `"${name}" pesa más de ${MAX_FILE_LABEL}.`
+          : `No se pudo subir "${name}".`;
+      setError(`${reason} Se subieron ${uploaded} de ${files.length}.`);
     } finally {
       setProgress(null);
     }
@@ -86,7 +88,7 @@ export function PropertyMediaUploadForm({ action, remaining }: PropertyMediaUplo
       </div>
       <div className="field">
         <label htmlFor="media-file">
-          Archivos (hasta {remaining} más, máximo {MAX_FILE_LABEL} cada uno)
+          Archivos (hasta {remaining} más; las fotos se reducen solas al subir)
         </label>
         <input id="media-file" name="file" type="file" multiple required disabled={uploading} />
       </div>
