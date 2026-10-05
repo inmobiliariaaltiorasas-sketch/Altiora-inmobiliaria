@@ -1,7 +1,10 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { PropertyMediaDto, PropertyMediaType } from '@altiora/shared-types';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
-import { FILE_STORAGE, type FileStorageService } from '../../../common/services/file-storage.interface';
+import {
+  FILE_STORAGE,
+  type FileStorageService,
+} from '../../../common/services/file-storage.interface';
 
 /** Límite de fotos por propiedad — pedido explícito del negocio, no una restricción técnica. */
 const MAX_MEDIA_PER_PROPERTY = 10;
@@ -36,7 +39,8 @@ export class PropertyMediaService {
       file.buffer,
     );
     /** R2 sirve la foto directo desde su URL pública; en local se sigue proxyeando por la API. */
-    const url = this.storage.publicUrl(storagePath) ?? `/property-media/file/${propertyId}/${fileName}`;
+    const url =
+      this.storage.publicUrl(storagePath) ?? `/property-media/file/${propertyId}/${fileName}`;
 
     return this.prisma.propertyMedia.create({
       data: {

@@ -33,7 +33,12 @@ export function PropertyMobileStickyBar({
   return (
     <div className={styles.bar}>
       {whatsappLink ? (
-        <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className={`btn btn-gold ${styles.btn}`}>
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`btn btn-gold ${styles.btn}`}
+        >
           <WhatsAppIcon className={styles.icon} aria-hidden="true" />
           {copy.whatsapp}
         </a>

@@ -146,7 +146,10 @@ export async function setCoverMediaAction(propertyId: string, mediaId: string): 
   revalidatePath(`/admin/propiedades/${propertyId}`);
 }
 
-export async function removePropertyMediaAction(propertyId: string, mediaId: string): Promise<void> {
+export async function removePropertyMediaAction(
+  propertyId: string,
+  mediaId: string,
+): Promise<void> {
   const token = await getAdminAccessToken();
   if (!token) redirect('/admin/login');
 
@@ -176,7 +179,8 @@ export async function updatePropertyStructuralAction(
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
-  if (!response.ok) throw new Error(`No se pudo actualizar los datos estructurales (${response.status})`);
+  if (!response.ok)
+    throw new Error(`No se pudo actualizar los datos estructurales (${response.status})`);
   revalidatePath(`/admin/propiedades/${propertyId}`);
 }
 

@@ -1,7 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { PropertyDocumentDto, PropertyDocumentType } from '@altiora/shared-types';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
-import { FILE_STORAGE, type FileStorageService } from '../../../common/services/file-storage.interface';
+import {
+  FILE_STORAGE,
+  type FileStorageService,
+} from '../../../common/services/file-storage.interface';
 
 /**
  * Documentos internos — NUNCA se exponen en el endpoint público de propiedad (v1 corrección 13).

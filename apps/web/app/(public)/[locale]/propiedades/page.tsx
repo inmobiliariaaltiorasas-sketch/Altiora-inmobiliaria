@@ -179,7 +179,12 @@ export default async function PropertiesSearchPage({
                 {copy.emptyCatalogContactCta}
               </Link>
               {whatsappLink ? (
-                <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+                <a
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                >
                   {copy.emptyCatalogWhatsappCta}
                 </a>
               ) : null}

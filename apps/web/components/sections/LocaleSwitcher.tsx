@@ -16,10 +16,7 @@ export function LocaleSwitcher({ locale, label }: { locale: SupportedLocale; lab
       {SUPPORTED_LOCALES.map((candidate, index) => (
         <span key={candidate} style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
           {index > 0 ? (
-            <span
-              aria-hidden="true"
-              style={{ color: 'var(--border)', fontSize: '0.7rem' }}
-            >
+            <span aria-hidden="true" style={{ color: 'var(--border)', fontSize: '0.7rem' }}>
               /
             </span>
           ) : null}
