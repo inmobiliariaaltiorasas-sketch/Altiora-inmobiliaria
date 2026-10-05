@@ -18,7 +18,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = (await params) as { locale: SupportedLocale };
-  return { title: `${COPY[locale].title} | ALTiora` };
+  return {
+    title: `${COPY[locale].title} | ALTiora`,
+    // Placeholder page: keep it out of the index but let crawlers follow its links.
+    robots: { index: false, follow: true },
+  };
 }
 
 export default async function CreditCalculatorPage({

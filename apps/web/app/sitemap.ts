@@ -5,15 +5,7 @@ import { listBlogSitemapEntries } from '@/lib/api/blog';
 import { buildSitemapEntries } from '@/lib/seo/sitemap-entries';
 import { SITE_URL } from '@/lib/seo/site-url';
 
-const STATIC_PATHS = [
-  '',
-  '/propiedades',
-  '/ciudades',
-  '/blog',
-  '/nosotros',
-  '/contacto',
-  '/calculadora-credito',
-];
+const STATIC_PATHS = ['', '/propiedades', '/ciudades', '/blog', '/nosotros', '/contacto'];
 
 /** Sitemap dinámico — apunta a `robots.ts`, faltaba implementarse (v1 sección 9, SEO). */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

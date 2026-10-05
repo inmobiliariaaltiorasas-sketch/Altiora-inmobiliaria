@@ -49,6 +49,8 @@ export async function generateMetadata({
   return {
     title: `${locale === 'es-CO' ? 'Proyectos' : 'Projects'} | ALTiora`,
     description: copy.metaDescription,
+    // Placeholder page: keep it out of the index but let crawlers follow its links.
+    robots: { index: false, follow: true },
   };
 }
 
@@ -65,12 +67,7 @@ export default async function ProjectsPage({ params }: { params: Promise<{ local
 
       <div className={styles.actions}>
         {whatsappLink ? (
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-gold"
-          >
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-gold">
             <WhatsAppIcon className={styles.icon} aria-hidden="true" />
             {copy.whatsappCta}
           </a>
