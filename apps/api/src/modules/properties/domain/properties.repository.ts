@@ -2,6 +2,7 @@ import type {
   Currency,
   OperationType,
   PropertyDetailDto,
+  PropertyFacetDto,
   PropertyPublicationStatus,
   PropertySearchResultDto,
   PropertySitemapEntryDto,
@@ -86,4 +87,5 @@ export interface PropertiesRepository {
   updatePrice(id: string, price: number, currency?: Currency): Promise<void>;
   getSnapshot(id: string): Promise<PropertySnapshot | null>;
   listSitemapEntries(): Promise<PropertySitemapEntryDto[]>;
+  listFacets(): Promise<PropertyFacetDto[]>;
 }

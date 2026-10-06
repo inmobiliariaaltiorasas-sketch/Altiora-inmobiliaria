@@ -115,6 +115,22 @@ export interface PropertySitemapEntryDto {
   locales: SupportedLocale[];
 }
 
+/**
+ * Inventory of public properties for one city, property type, operation and currency. Prices are
+ * never mixed across currencies, so a combination listed in two currencies yields two entries.
+ */
+export interface PropertyFacetDto {
+  citySlug: string;
+  cityName: string;
+  propertyTypeSlug: string;
+  propertyTypeName: string;
+  operationType: OperationType;
+  currency: Currency;
+  count: number;
+  minPrice: number;
+  maxPrice: number;
+}
+
 export interface UpsertPropertyTranslationDto {
   locale: SupportedLocale;
   title: string;
