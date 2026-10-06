@@ -7,7 +7,8 @@ export const MIN_CATEGORY_INVENTORY = 1;
 interface TypeNames {
   /** Plural used in the URL slug. */
   slug: string;
-  label: Record<SupportedLocale, string>;
+  singular: Record<SupportedLocale, string>;
+  plural: Record<SupportedLocale, string>;
 }
 
 /**
@@ -15,13 +16,30 @@ interface TypeNames {
  * is the display order. A type that is not listed here has no category page.
  */
 const CATEGORY_TYPES: Record<string, TypeNames> = {
-  casa: { slug: 'casas', label: { 'es-CO': 'Casas', 'en-US': 'Houses' } },
-  apartamento: { slug: 'apartamentos', label: { 'es-CO': 'Apartamentos', 'en-US': 'Apartments' } },
-  lote: { slug: 'lotes', label: { 'es-CO': 'Lotes', 'en-US': 'Lots' } },
-  finca: { slug: 'fincas', label: { 'es-CO': 'Fincas', 'en-US': 'Farms' } },
+  casa: {
+    slug: 'casas',
+    singular: { 'es-CO': 'casa', 'en-US': 'house' },
+    plural: { 'es-CO': 'casas', 'en-US': 'houses' },
+  },
+  apartamento: {
+    slug: 'apartamentos',
+    singular: { 'es-CO': 'apartamento', 'en-US': 'apartment' },
+    plural: { 'es-CO': 'apartamentos', 'en-US': 'apartments' },
+  },
+  lote: {
+    slug: 'lotes',
+    singular: { 'es-CO': 'lote', 'en-US': 'lot' },
+    plural: { 'es-CO': 'lotes', 'en-US': 'lots' },
+  },
+  finca: {
+    slug: 'fincas',
+    singular: { 'es-CO': 'finca', 'en-US': 'farm' },
+    plural: { 'es-CO': 'fincas', 'en-US': 'farms' },
+  },
   'local-comercial': {
     slug: 'locales-comerciales',
-    label: { 'es-CO': 'Locales comerciales', 'en-US': 'Commercial spaces' },
+    singular: { 'es-CO': 'local comercial', 'en-US': 'commercial space' },
+    plural: { 'es-CO': 'locales comerciales', 'en-US': 'commercial spaces' },
   },
 };
 
@@ -55,7 +73,7 @@ export interface CityCategory {
 
 /** `casa` + `SALE` gives `casas-en-venta`; `null` when the type has no category page. */
 export function buildCategorySlug(typeSlug: string, operation: OperationType): string | null {
-  const type = Object.hasOwn(CATEGORY_TYPES, typeSlug) ? CATEGORY_TYPES[typeSlug] : undefined;
+  const type = typeNames(typeSlug);
   return type ? `${type.slug}-en-${OPERATION_SLUGS[operation]}` : null;
 }
 
@@ -71,15 +89,31 @@ export function parseCategorySlug(slug: string): CategoryRef | null {
   return null;
 }
 
+function typeNames(typeSlug: string): TypeNames | undefined {
+  return Object.hasOwn(CATEGORY_TYPES, typeSlug) ? CATEGORY_TYPES[typeSlug] : undefined;
+}
+
+/** Lowercase noun for a type, singular for exactly one property, for example "casas". */
+export function categoryNoun(typeSlug: string, count: number, locale: SupportedLocale): string {
+  const names = typeNames(typeSlug);
+  if (!names) return typeSlug;
+  return count === 1 ? names.singular[locale] : names.plural[locale];
+}
+
+/** Operation as it reads in a sentence: "en venta", "for rent". */
+export function operationPhrase(operation: OperationType, locale: SupportedLocale): string {
+  return OPERATION_LABELS[locale][operation];
+}
+
 /** Human title of a category, for example "Casas en venta" or "Houses for sale". */
 export function categoryLabel(
   typeSlug: string,
   operation: OperationType,
   locale: SupportedLocale,
 ): string {
-  const type = Object.hasOwn(CATEGORY_TYPES, typeSlug) ? CATEGORY_TYPES[typeSlug] : undefined;
-  const typeLabel = type?.label[locale] ?? typeSlug;
-  return `${typeLabel} ${OPERATION_LABELS[locale][operation]}`;
+  const noun = categoryNoun(typeSlug, 2, locale);
+  const capitalised = noun.charAt(0).toUpperCase() + noun.slice(1);
+  return `${capitalised} ${OPERATION_LABELS[locale][operation]}`;
 }
 
 /**

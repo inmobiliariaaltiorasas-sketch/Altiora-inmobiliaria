@@ -1,0 +1,43 @@
+/* Only the elements the city page does not have; everything else reuses ../page.module.css. */
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cta {
+  margin-top: 2.5rem;
+  padding: 1.75rem 1.5rem;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.ctaTitle {
+  font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+}
+
+.ctaActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.related {
+  margin-top: 2.5rem;
+}
+
+.relatedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.relatedLink {
+  background: var(--surface-2);
+  color: var(--navy-900);
+  text-decoration: none;
+}

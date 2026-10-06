@@ -4,6 +4,7 @@ import {
   MIN_CATEGORY_INVENTORY,
   buildCategorySlug,
   categoryLabel,
+  categoryNoun,
   parseCategorySlug,
   selectCityCategories,
 } from './categories';
@@ -82,6 +83,22 @@ describe('categoryLabel', () => {
     );
     expect(categoryLabel('casa', 'SALE', 'en-US')).toBe('Houses for sale');
     expect(categoryLabel('apartamento', 'RENT', 'en-US')).toBe('Apartments for rent');
+  });
+});
+
+describe('categoryNoun', () => {
+  it('uses the singular for exactly one property and the plural otherwise', () => {
+    expect(categoryNoun('casa', 1, 'es-CO')).toBe('casa');
+    expect(categoryNoun('casa', 3, 'es-CO')).toBe('casas');
+    expect(categoryNoun('local-comercial', 1, 'es-CO')).toBe('local comercial');
+    expect(categoryNoun('local-comercial', 2, 'es-CO')).toBe('locales comerciales');
+    expect(categoryNoun('apartamento', 1, 'en-US')).toBe('apartment');
+    expect(categoryNoun('lote', 4, 'en-US')).toBe('lots');
+    expect(categoryNoun('local-comercial', 1, 'en-US')).toBe('commercial space');
+  });
+
+  it('falls back to the type slug for an unknown type', () => {
+    expect(categoryNoun('bodega', 2, 'es-CO')).toBe('bodega');
   });
 });
 
