@@ -7,6 +7,7 @@ const baseInput = {
   baseUrl: BASE,
   staticPaths: ['', '/blog'],
   cities: [{ slug: 'cartago' }],
+  categories: [] as { citySlug: string; slug: string }[],
   properties: [] as { slug: string; updatedAt: string; locales: string[] }[],
   posts: [] as { slug: string; updatedAt: string; locales: string[] }[],
 };
@@ -31,6 +32,29 @@ describe('buildSitemapEntries', () => {
     expect(blogEn?.alternates?.languages).toEqual(expected);
     expect(find(entries, 'https://example.com/en-US/ciudades/cartago')).toBeDefined();
     expect(find(entries, 'https://example.com/es-CO')).toBeDefined();
+  });
+
+  it('lists each existing category in both locales with alternates', () => {
+    const entries = buildSitemapEntries({
+      ...baseInput,
+      categories: [{ citySlug: 'cartago', slug: 'casas-en-venta' }],
+    });
+    const es = find(entries, 'https://example.com/es-CO/ciudades/cartago/casas-en-venta');
+    const en = find(entries, 'https://example.com/en-US/ciudades/cartago/casas-en-venta');
+    const expected = {
+      'es-CO': 'https://example.com/es-CO/ciudades/cartago/casas-en-venta',
+      'en-US': 'https://example.com/en-US/ciudades/cartago/casas-en-venta',
+      'x-default': 'https://example.com/es-CO/ciudades/cartago/casas-en-venta',
+    };
+    expect(es?.alternates?.languages).toEqual(expected);
+    expect(en?.alternates?.languages).toEqual(expected);
+    expect(es?.changeFrequency).toBe('weekly');
+  });
+
+  it('lists no category URL when there are no categories', () => {
+    const entries = buildSitemapEntries(baseInput);
+    expect(entries.some((entry) => entry.url.includes('-en-venta'))).toBe(false);
+    expect(entries.some((entry) => entry.url.includes('-en-arriendo'))).toBe(false);
   });
 
   it('lists a property only in the locales that have a translation', () => {

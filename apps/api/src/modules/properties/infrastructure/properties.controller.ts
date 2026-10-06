@@ -12,6 +12,7 @@ import {
 import type {
   JwtPayload,
   PropertyDetailDto,
+  PropertyFacetDto,
   PropertySearchResultDto,
   PropertySitemapEntryDto,
   SupportedLocale,
@@ -41,6 +42,12 @@ export class PropertiesController {
   @Get('sitemap-entries')
   sitemapEntries(): Promise<PropertySitemapEntryDto[]> {
     return this.propertiesService.listSitemapEntries();
+  }
+
+  /** Declared before `:slug` (last route) so "facets" is never read as a property slug. */
+  @Get('facets')
+  facets(): Promise<PropertyFacetDto[]> {
+    return this.propertiesService.listFacets();
   }
 
   // --- Admin — deben ir antes de ':slug' para no ser interpretadas como un slug ---

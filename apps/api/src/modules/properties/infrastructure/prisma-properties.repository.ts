@@ -5,6 +5,7 @@ import {
   type SupportedLocale,
   type Currency,
   type PropertyDetailDto,
+  type PropertyFacetDto,
   type PropertyPublicationStatus,
   type PropertySearchResultDto,
   type PropertySitemapEntryDto,
@@ -15,6 +16,7 @@ import {
   excludeDemoPropertiesWhere,
   publicPropertyWhere,
 } from '../../../common/utils/property-visibility';
+import { toPropertyFacets } from '../../../common/utils/property-facets';
 import { toSitemapEntry } from '../../../common/utils/sitemap-entry';
 import type {
   CreatePropertyInput,
@@ -205,6 +207,20 @@ export class PrismaPropertiesRepository implements PropertiesRepository {
       select: { slug: true, updatedAt: true, translations: { select: { locale: true } } },
     });
     return properties.map(toSitemapEntry);
+  }
+
+  async listFacets(): Promise<PropertyFacetDto[]> {
+    const properties = await this.prisma.property.findMany({
+      where: publicPropertyWhere(),
+      select: {
+        price: true,
+        currency: true,
+        operationType: true,
+        city: { select: { slug: true, name: true } },
+        propertyType: { select: { slug: true, name: true } },
+      },
+    });
+    return toPropertyFacets(properties.map((p) => ({ ...p, price: Number(p.price) })));
   }
 
   private async findRelated(

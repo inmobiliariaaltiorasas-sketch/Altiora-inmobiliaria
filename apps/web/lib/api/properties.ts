@@ -1,6 +1,7 @@
 import type {
   OperationType,
   PropertyDetailDto,
+  PropertyFacetDto,
   PropertySearchResultDto,
   PropertySitemapEntryDto,
   SupportedLocale,
@@ -51,4 +52,18 @@ export async function getPropertyBySlug(
 
 export function listSitemapEntries(): Promise<PropertySitemapEntryDto[]> {
   return apiClient('/properties/sitemap-entries', { next: { revalidate: 3600 } });
+}
+
+/**
+ * Public inventory per city, type and operation. Categories are an enhancement, so any failure
+ * (a 404 from an API deployed before this endpoint, a 5xx, a network error) degrades to "no
+ * categories" instead of breaking the page or the sitemap that asked for them.
+ */
+export async function listPropertyFacets(): Promise<PropertyFacetDto[]> {
+  try {
+    const facets = await apiClient<unknown>('/properties/facets', { next: { revalidate: 60 } });
+    return Array.isArray(facets) ? (facets as PropertyFacetDto[]) : [];
+  } catch {
+    return [];
+  }
 }

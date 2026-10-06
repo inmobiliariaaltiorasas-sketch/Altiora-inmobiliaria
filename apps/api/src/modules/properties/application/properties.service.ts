@@ -10,6 +10,7 @@ import {
   DEFAULT_LOCALE,
   type AuditAction,
   type PropertyDetailDto,
+  type PropertyFacetDto,
   type PropertyPublicationStatus,
   type PropertySearchResultDto,
   type PropertySitemapEntryDto,
@@ -228,6 +229,10 @@ export class PropertiesService {
 
   listSitemapEntries(): Promise<PropertySitemapEntryDto[]> {
     return this.repository.listSitemapEntries();
+  }
+
+  listFacets(): Promise<PropertyFacetDto[]> {
+    return this.repository.listFacets();
   }
 
   private async changeStatus(

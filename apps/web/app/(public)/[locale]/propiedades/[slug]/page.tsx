@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
-import { getPropertyBySlug } from '@/lib/api/properties';
+import { getPropertyBySlug, listPropertyFacets } from '@/lib/api/properties';
 import { getFxRateUsdCop } from '@/lib/api/settings';
 import { resolveMediaUrl } from '@/lib/api-client';
 import { PropertyCard } from '@/components/blocks/PropertyCard';
@@ -15,6 +15,8 @@ import { ShareButton } from '@/components/ui/ShareButton';
 import { formatArea, formatPrice, formatUsdEstimate } from '@/lib/format';
 import { resolveDetailAlternates } from '@/lib/seo/alternates';
 import { buildBreadcrumbList } from '@/lib/seo/breadcrumbs';
+import { findCityCategory } from '@/lib/seo/categories';
+import { buildCategoryHeading } from '@/lib/seo/category-page';
 import { buildPropertyJsonLd } from '@/lib/seo/property-jsonld';
 import { buildSocialMetadata } from '@/lib/seo/social';
 import { ORGANIZATION_INFO } from '@/lib/seo/organization';
@@ -37,6 +39,7 @@ const COPY: Record<
     breadcrumbHome: string;
     breadcrumbProperties: string;
     updatedAt: string;
+    moreInCategory: string;
     usdEstimate: string;
     favorite: string;
     share: string;
@@ -58,6 +61,7 @@ const COPY: Record<
     breadcrumbHome: 'Inicio',
     breadcrumbProperties: 'Propiedades',
     updatedAt: 'Actualizado el',
+    moreInCategory: 'Ver más',
     usdEstimate: 'Estimado (conversión informativa, no oficial)',
     favorite: 'Guardar en favoritos',
     share: 'Compartir',
@@ -84,6 +88,7 @@ const COPY: Record<
     breadcrumbHome: 'Home',
     breadcrumbProperties: 'Properties',
     updatedAt: 'Updated on',
+    moreInCategory: 'See more',
     usdEstimate: 'Estimate (informational conversion, not official)',
     favorite: 'Save to favorites',
     share: 'Share',
@@ -159,9 +164,10 @@ export async function generateMetadata({
 
 export default async function PropertyDetailPage({ params }: { params: Promise<RouteParams> }) {
   const { locale, slug } = (await params) as { locale: SupportedLocale; slug: string };
-  const [property, fxRate] = await Promise.all([
+  const [property, fxRate, facets] = await Promise.all([
     getPropertyBySlug(slug, locale),
     getFxRateUsdCop(),
+    listPropertyFacets(),
   ]);
   if (!property) notFound();
 
@@ -177,6 +183,14 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
   const locationLabel = property.location.neighborhood
     ? `${property.location.neighborhood.name}, ${property.location.city.name}`
     : `${property.location.city.name}, ${property.location.city.department}`;
+
+  // Linked only when the category page exists (it has at least one public property).
+  const category = findCityCategory(
+    facets,
+    property.location.city.slug,
+    property.propertyType.slug,
+    property.operationType,
+  );
 
   const breadcrumb = [
     { name: copy.breadcrumbHome, url: `${SITE_URL}/${locale}` },
@@ -236,6 +250,20 @@ export default async function PropertyDetailPage({ params }: { params: Promise<R
       <p className={styles.updatedAt}>
         {copy.updatedAt} {new Date(property.updatedAt).toLocaleDateString(locale)}
       </p>
+
+      {category ? (
+        <p className={styles.categoryLink}>
+          <Link href={`/${locale}/ciudades/${property.location.city.slug}/${category.slug}`}>
+            {copy.moreInCategory}:{' '}
+            {buildCategoryHeading({
+              category,
+              cityName: property.location.city.name,
+              department: property.location.city.department,
+              locale,
+            })}
+          </Link>
+        </p>
+      ) : null}
 
       <div className={styles.gallery}>
         <PropertyGallery media={property.media} title={propertyTitle} locale={locale} />

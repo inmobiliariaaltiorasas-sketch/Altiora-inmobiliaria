@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import type { OperationType, SupportedLocale } from '@altiora/shared-types';
+import { CategoryLinks } from '@/components/blocks/CategoryLinks';
 import { PropertyCard } from '@/components/blocks/PropertyCard';
 import { PropertySearchForm } from '@/components/blocks/PropertySearchForm';
-import { searchProperties } from '@/lib/api/properties';
+import { listPropertyFacets, searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getPropertyTypes } from '@/lib/api/catalog';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { selectAllCategories } from '@/lib/seo/categories';
+import { buildCategoryHeading } from '@/lib/seo/category-page';
 import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
 import { buildSocialMetadata } from '@/lib/seo/social';
 import styles from './page.module.css';
@@ -25,6 +28,7 @@ const COPY: Record<
     previous: string;
     next: string;
     results: (n: number) => string;
+    categories: string;
   }
 > = {
   'es-CO': {
@@ -42,6 +46,7 @@ const COPY: Record<
     previous: '← Anterior',
     next: 'Siguiente →',
     results: (n) => `${n} propiedades encontradas`,
+    categories: 'Explora por categoría',
   },
   'en-US': {
     title: 'Properties for sale and rent in Cartago',
@@ -58,6 +63,7 @@ const COPY: Record<
     previous: '← Previous',
     next: 'Next →',
     results: (n) => `${n} properties found`,
+    categories: 'Browse by category',
   },
 };
 
@@ -96,7 +102,7 @@ export default async function PropertiesSearchPage({
   const copy = COPY[locale];
 
   const page = sp.page ? Number(sp.page) : 1;
-  const [results, locations, propertyTypes] = await Promise.all([
+  const [results, locations, propertyTypes, facets] = await Promise.all([
     searchProperties({
       locale,
       city: sp.city,
@@ -110,6 +116,7 @@ export default async function PropertiesSearchPage({
     }),
     getLocationsTree(),
     getPropertyTypes(),
+    listPropertyFacets(),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(results.total / results.pageSize));
@@ -220,6 +227,20 @@ export default async function PropertiesSearchPage({
           ) : null}
         </nav>
       ) : null}
+
+      <CategoryLinks
+        heading={copy.categories}
+        links={selectAllCategories(facets, locations).map(({ city, category }) => ({
+          href: `/${locale}/ciudades/${city.slug}/${category.slug}`,
+          label: buildCategoryHeading({
+            category,
+            cityName: city.name,
+            department: city.department,
+            locale,
+          }),
+          count: category.count,
+        }))}
+      />
     </main>
   );
 }
