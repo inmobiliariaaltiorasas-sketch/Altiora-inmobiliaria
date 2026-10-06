@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
+import { CategoryLinks } from '@/components/blocks/CategoryLinks';
 import { PropertyCard } from '@/components/blocks/PropertyCard';
 import { listPropertyFacets, searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
@@ -230,23 +231,14 @@ export default async function CityCategoryPage({ params }: { params: Promise<Rou
           </div>
         </div>
 
-        {otherCategories.length > 0 ? (
-          <nav className={styles.related} aria-label={copy.otherCategories}>
-            <h2 className={cityStyles.faqTitle}>{copy.otherCategories}</h2>
-            <ul className={styles.relatedList}>
-              {otherCategories.map((other) => (
-                <li key={other.slug}>
-                  <Link
-                    href={`/${locale}/ciudades/${ciudad}/${other.slug}`}
-                    className={`badge ${styles.relatedLink}`}
-                  >
-                    {categoryLabel(other.typeSlug, other.operationType, locale)} ({other.count})
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : null}
+        <CategoryLinks
+          heading={copy.otherCategories}
+          links={otherCategories.map((other) => ({
+            href: `/${locale}/ciudades/${ciudad}/${other.slug}`,
+            label: categoryLabel(other.typeSlug, other.operationType, locale),
+            count: other.count,
+          }))}
+        />
 
         <section className={cityStyles.faqSection} style={{ marginTop: '3.5rem' }}>
           <h2 className={cityStyles.faqTitle}>{copy.faq}</h2>

@@ -5,7 +5,9 @@ import {
   buildCategorySlug,
   categoryLabel,
   categoryNoun,
+  findCityCategory,
   parseCategorySlug,
+  selectAllCategories,
   selectCityCategories,
 } from './categories';
 
@@ -171,5 +173,49 @@ describe('selectCityCategories', () => {
       'apartamentos-en-venta',
       'lotes-en-venta',
     ]);
+  });
+});
+
+describe('findCityCategory', () => {
+  const facets = [facet(), facet({ operationType: 'RENT', count: 1 })];
+
+  it('finds the category of a type and operation in a city', () => {
+    expect(findCityCategory(facets, 'cartago-valle-del-cauca', 'casa', 'RENT')?.slug).toBe(
+      'casas-en-arriendo',
+    );
+  });
+
+  it('returns null when that category does not exist', () => {
+    expect(findCityCategory(facets, 'cartago-valle-del-cauca', 'lote', 'SALE')).toBeNull();
+    expect(findCityCategory(facets, 'zarzal', 'casa', 'SALE')).toBeNull();
+    expect(findCityCategory(facets, 'cartago-valle-del-cauca', 'bodega', 'SALE')).toBeNull();
+  });
+});
+
+describe('selectAllCategories', () => {
+  const cities = [
+    { slug: 'cartago-valle-del-cauca', name: 'Cartago', department: 'Valle del Cauca' },
+    { slug: 'zarzal', name: 'Zarzal', department: 'Valle del Cauca' },
+  ];
+
+  it('lists the categories of every city that has inventory, in city order', () => {
+    const entries = selectAllCategories(
+      [facet({ citySlug: 'zarzal' }), facet(), facet({ operationType: 'RENT' })],
+      cities,
+    );
+    expect(entries.map((e) => `${e.city.slug}/${e.category.slug}`)).toEqual([
+      'cartago-valle-del-cauca/casas-en-venta',
+      'cartago-valle-del-cauca/casas-en-arriendo',
+      'zarzal/casas-en-venta',
+    ]);
+    expect(entries[0]?.city.name).toBe('Cartago');
+  });
+
+  it('ignores facets of a city that is not in the locations tree', () => {
+    expect(selectAllCategories([facet({ citySlug: 'fantasma' })], cities)).toEqual([]);
+  });
+
+  it('returns nothing without facets', () => {
+    expect(selectAllCategories([], cities)).toEqual([]);
   });
 });

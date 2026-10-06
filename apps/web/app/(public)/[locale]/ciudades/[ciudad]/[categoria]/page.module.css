@@ -22,22 +22,3 @@
   flex-wrap: wrap;
   gap: 0.6rem;
 }
-
-.related {
-  margin-top: 2.5rem;
-}
-
-.relatedList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding: 0;
-  list-style: none;
-}
-
-.relatedLink {
-  background: var(--surface-2);
-  color: var(--navy-900);
-  text-decoration: none;
-}

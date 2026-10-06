@@ -162,3 +162,33 @@ export function selectCityCategories(
         OPERATIONS.indexOf(a.operationType) - OPERATIONS.indexOf(b.operationType),
     );
 }
+
+/** The category of a type and operation in a city, or `null` when it has no public property. */
+export function findCityCategory(
+  facets: readonly PropertyFacetDto[],
+  citySlug: string,
+  typeSlug: string,
+  operation: OperationType,
+): CityCategory | null {
+  const slug = buildCategorySlug(typeSlug, operation);
+  if (!slug) return null;
+  return selectCityCategories(facets, citySlug).find((category) => category.slug === slug) ?? null;
+}
+
+export interface CategoryEntry {
+  city: { slug: string; name: string; department: string };
+  category: CityCategory;
+}
+
+/** Every existing category, grouped by city in the order the cities are given. */
+export function selectAllCategories(
+  facets: readonly PropertyFacetDto[],
+  cities: readonly { slug: string; name: string; department: string }[],
+): CategoryEntry[] {
+  return cities.flatMap((city) =>
+    selectCityCategories(facets, city.slug).map((category) => ({
+      city: { slug: city.slug, name: city.name, department: city.department },
+      category,
+    })),
+  );
+}

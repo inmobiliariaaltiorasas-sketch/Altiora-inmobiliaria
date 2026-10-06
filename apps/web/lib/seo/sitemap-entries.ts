@@ -11,6 +11,8 @@ export interface SitemapInput {
   baseUrl: string;
   staticPaths: readonly string[];
   cities: readonly { slug: string }[];
+  /** Category landing pages that exist (at least one public property), per city. */
+  categories: readonly { citySlug: string; slug: string }[];
   properties: readonly LocalizedEntry[];
   posts: readonly LocalizedEntry[];
 }
@@ -54,7 +56,7 @@ function knownLocales(locales: readonly string[] | undefined): SupportedLocale[]
 }
 
 /**
- * Pure sitemap builder. Static pages and cities exist in every locale; properties and posts are
+ * Pure sitemap builder. Static pages, cities and categories exist in every locale; properties and posts are
  * listed only in the locales that have a real translation, so untranslated fallback URLs never
  * reach the sitemap.
  */
@@ -72,6 +74,16 @@ export function buildSitemapEntries(input: SitemapInput): MetadataRoute.Sitemap 
       ...localizedEntries(baseUrl, `/ciudades/${city.slug}`, SUPPORTED_LOCALES, {
         changeFrequency: 'weekly',
       }),
+    );
+  }
+  for (const category of input.categories) {
+    entries.push(
+      ...localizedEntries(
+        baseUrl,
+        `/ciudades/${category.citySlug}/${category.slug}`,
+        SUPPORTED_LOCALES,
+        { changeFrequency: 'weekly' },
+      ),
     );
   }
   for (const property of input.properties) {

@@ -2,11 +2,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { SupportedLocale } from '@altiora/shared-types';
+import { CategoryLinks } from '@/components/blocks/CategoryLinks';
 import { PropertyCard } from '@/components/blocks/PropertyCard';
-import { searchProperties } from '@/lib/api/properties';
+import { listPropertyFacets, searchProperties } from '@/lib/api/properties';
 import { getLocationsTree } from '@/lib/api/locations';
 import { getCityFaqs } from '@/lib/api/content';
 import { buildBreadcrumbList } from '@/lib/seo/breadcrumbs';
+import { categoryLabel, selectCityCategories } from '@/lib/seo/categories';
 import { buildAlternates, ORGANIZATION_INFO } from '@/lib/seo/organization';
 import { buildSocialMetadata } from '@/lib/seo/social';
 import { SITE_URL } from '@/lib/seo/site-url';
@@ -102,6 +104,7 @@ const COPY: Record<
     emptyCta: string;
     neighborhoods: string;
     faq: string;
+    categories: string;
   }
 > = {
   'es-CO': {
@@ -112,6 +115,7 @@ const COPY: Record<
     emptyCta: 'Hablar con un asesor',
     neighborhoods: 'Barrios',
     faq: 'Preguntas frecuentes',
+    categories: 'Propiedades por categoría',
   },
   'en-US': {
     breadcrumbHome: 'Home',
@@ -121,6 +125,7 @@ const COPY: Record<
     emptyCta: 'Talk to an advisor',
     neighborhoods: 'Neighborhoods',
     faq: 'Frequently asked questions',
+    categories: 'Properties by category',
   },
 };
 
@@ -169,10 +174,12 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
   const city = cities.find((c) => c.slug === ciudad);
   if (!city) notFound();
 
-  const [results, dynamicFaqs] = await Promise.all([
+  const [results, dynamicFaqs, facets] = await Promise.all([
     searchProperties({ locale, city: ciudad, pageSize: 24 }),
     getCityFaqs(ciudad, locale),
+    listPropertyFacets(),
   ]);
+  const categories = selectCityCategories(facets, ciudad);
 
   const staticFaqs = staticCityFaqs(locale, city.name, results.items.length > 0);
   const faqs = [...dynamicFaqs, ...staticFaqs];
@@ -260,6 +267,15 @@ export default async function CityPage({ params }: { params: Promise<RouteParams
             ))}
           </div>
         )}
+
+        <CategoryLinks
+          heading={copy.categories}
+          links={categories.map((category) => ({
+            href: `/${locale}/ciudades/${ciudad}/${category.slug}`,
+            label: categoryLabel(category.typeSlug, category.operationType, locale),
+            count: category.count,
+          }))}
+        />
 
         {faqs.length > 0 ? (
           <section className={styles.faqSection} style={{ marginTop: '3.5rem' }}>
